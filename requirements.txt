@@ -6,3 +6,4 @@ openai
 python-dotenv
 alpha_vantage
 yfinance
+timedelta
