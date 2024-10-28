@@ -11,7 +11,7 @@ from functions.financial_market_tracker.slack_bot import post_file_content_to_sl
 default_args = {
     'owner': 'airflow',  # Owner of the DAG
     'depends_on_past': False,  # Each task run is independent of past runs
-    'start_date': datetime(2023, 10, 1),  # Start date of the DAG
+    'start_date': datetime(2024, 10, 29),  # Start date of the DAG
     'email_on_failure': False,  # Do not send emails on task failure
     'email_on_retry': False,  # Do not send emails on task retry
     'retries': 1,  # Number of retries allowed if the task fails

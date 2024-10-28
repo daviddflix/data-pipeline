@@ -2,6 +2,11 @@ import os
 from openai import OpenAI
 from typing import List, Dict, Any, Optional
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file
+load_dotenv()
+
 
 class VectorStoreManager:
     def __init__(self, api_key: str):
@@ -249,7 +254,7 @@ class VectorStoreManager:
 # Example usage
 
 # Retrieve API key from environment variable
-# api_key = os.getenv("OPENAI_API_KEY")
+#api_key = os.getenv("OPENAI_API_KEY")
 # if not api_key:
 #     raise ValueError("OPENAI_API_KEY environment variable not set")
 

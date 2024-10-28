@@ -32,7 +32,7 @@ with DAG(
     default_args=default_args,
     description='DAG to run web scraping, process and upload files',  # Description of the DAG
     schedule_interval=timedelta(days=1),  # Schedule interval (daily)
-    start_date=datetime(2024, 9, 11),  # Start date for the DAG
+    start_date=datetime(2024, 10, 29),  # Start date for the DAG
     catchup=False,  # Do not run past DAG instances
 ) as dag:
 

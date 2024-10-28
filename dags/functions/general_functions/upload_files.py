@@ -11,7 +11,7 @@ VECTOR_STORE_ID = os.getenv('VECTOR_STORE_ID')
 
 # Initialize the VectorStoreManager using the API key
 manager = VectorStoreManager(api_key=API_KEY)
-
+print(API_KEY)
 # Define the folder where preprocessed files are located
 PREPROCESSED_FOLDER = '/opt/airflow/dags/files/preprocessed'  # Adjust this path based on where your preprocessed files are stored
 

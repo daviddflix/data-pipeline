@@ -56,23 +56,22 @@ services:
 
   scheduler:
     build:
-      context: .  # Build context is the current directory
-      dockerfile: Dockerfile  # Specify the Dockerfile to use for building
+      context: .
+      dockerfile: Dockerfile
     depends_on:
-      - airflow-init  # Wait for the airflow-init service to complete
+      - airflow-init
     environment:
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow  # Database connection string
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor  # Set the executor type
-      AIRFLOW__WEBSERVER__SECRET_KEY: "0506"  # Set a secret key for the webserver
-    #volumes:
-      #- /home/lourdes22/data-pipeline/files:/opt/airflow/files 
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__WEBSERVER__SECRET_KEY: "0506"
+    command: "airflow scheduler" 
     networks:
-      - airflow  # Connect to the 'airflow' network
+      - airflow
     healthcheck:
-      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob"]  # Health check for the scheduler
-      interval: 10s  # Interval between health checks
-      retries: 5  # Number of retries before marking the service as unhealthy
-      timeout: 5s  # Timeout for the health check command
+      test: ["CMD-SHELL", "airflow jobs check --job-type SchedulerJob"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   worker:
     image: apache/airflow:2.5.1  # Use a specific version of Apache Airflow
