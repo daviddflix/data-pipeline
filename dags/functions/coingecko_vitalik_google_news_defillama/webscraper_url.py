@@ -1,8 +1,5 @@
-#webscraper.py
-
 import os
 import json
-
 import requests
 import random
 import feedparser

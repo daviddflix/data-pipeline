@@ -85,7 +85,7 @@ with DAG(
         """
         webscraping_dir = '/opt/airflow/dags/files/webscraper/'  # Directory where web scraping output is stored
         preprocessed_dir = '/opt/airflow/dags/files/preprocessed/'  # Directory to save preprocessed output
-        local_dir = '/opt/airflow/files/'
+        #local_dir = '/opt/airflow/files/'
         execute_news_extraction_pipeline(webscraping_dir, preprocessed_dir)  # Run the extraction pipeline
         get_all_files(webscraping_dir)  # Retrieve all files in the directory
         delete_files(webscraping_dir)  # Delete processed files to clean up
@@ -125,8 +125,8 @@ with DAG(
         """
         webscraping_dir = '/opt/airflow/dags/files/webscraper/'  # Directory where web scraping output is stored
         preprocessed_dir = '/opt/airflow/dags/files/preprocessed/consolidated_google_news.txt'  # Directory to save preprocessed output
-        local_dir = '/opt/airflow/files/consolidated_google_news.txt'
-        process_news_from_directory(webscraping_dir, preprocessed_dir, local_dir)  # Process Google News data
+        #local_dir = '/opt/airflow/files/consolidated_google_news.txt'
+        process_news_from_directory(webscraping_dir, preprocessed_dir)  # Process Google News data
         get_all_files(webscraping_dir)  # Retrieve all files in the directory
         delete_files(webscraping_dir)  # Clean up processed files
 

@@ -103,18 +103,12 @@ def execute_news_extraction_pipeline(scraper_directory, consolidated_directory):
 
     # Define the path of the consolidated file in the specified directory
     consolidated_file_path = os.path.join(consolidated_directory, "consolidated_vitalik_news.txt")
-    local_file_path = os.path.join('/opt/airflow/files/', "consolidated_vitalik_news.txt")
 
     # Load the links from the TXT file
     links = load_links_from_txt(txt_file_path)
 
     # Create a blank consolidated file before adding news articles
     with open(consolidated_file_path, 'w', encoding='utf-8') as f:
-        f.write("Consolidated News\n")
-        f.write("="*80 + "\n\n")
-
-    # Create a blank consolidated file before adding news articles
-    with open(local_file_path, 'w', encoding='utf-8') as f:
         f.write("Consolidated News\n")
         f.write("="*80 + "\n\n")
     # Store processed URLs to avoid repetition
@@ -130,7 +124,6 @@ def execute_news_extraction_pipeline(scraper_directory, consolidated_directory):
             if content:
                 print(f"\n### Title: {title}\n### Date: {date}\n### Content:\n{content[:500]}...\n")
                 save_to_consolidated_file(title, date, content, consolidated_file_path)
-                save_to_consolidated_file(title, date, content, local_file_path)
                 processed_urls.add(real_url)  # Mark the URL as processed
             else:
                 print(f"Could not extract news content for {real_url}\n")
@@ -138,7 +131,6 @@ def execute_news_extraction_pipeline(scraper_directory, consolidated_directory):
             print(f"Could not obtain the real URL for {link} or the URL has already been processed\n")
 
     print(f"Consolidated file saved at: {consolidated_file_path}")
-    print(f"Consolidated file saved at: {local_file_path}")
     
 
 # Example usage: replace with your actual paths

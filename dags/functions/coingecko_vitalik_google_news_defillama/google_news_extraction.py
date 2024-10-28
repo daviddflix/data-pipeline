@@ -145,7 +145,7 @@ def extract_news_content(url):
         print(f"Error processing {url}: {e}")
         return None, None, None
 
-def save_to_consolidated_file(title, date, content, output_path, local_dir):
+def save_to_consolidated_file(title, date, content, output_path):
     """Saves the news article in a consolidated file with all extracted news."""
     with open(output_path, 'a', encoding='utf-8') as file:
         file.write(f"Title: {title}\n")
@@ -154,17 +154,9 @@ def save_to_consolidated_file(title, date, content, output_path, local_dir):
         file.write(content)
         file.write("\n" + "="*80 + "\n")
     print(f"News saved to consolidated file: {output_path}")
-    
-    #To save locally 
-    with open(local_dir, 'a', encoding='utf-8') as file:
-        file.write(f"Title: {title}\n")
-        file.write(f"Date: {date}\n")
-        file.write("Content:\n")
-        file.write(content)
-        file.write("\n" + "="*80 + "\n")
-    print(f"News saved to consolidated file: {output_path}")
 
-def process_news_from_directory(input_directory, consolidated_file_path, local_dir):
+
+def process_news_from_directory(input_directory, consolidated_file_path):
     """Processes all 'Scrape_Result' files in the input directory and consolidates the news into the specified file."""
     scraper_files = find_scraper_result_files(input_directory)
 
@@ -175,11 +167,6 @@ def process_news_from_directory(input_directory, consolidated_file_path, local_d
 
     # Create a new consolidated file
     with open(consolidated_file_path, 'w', encoding='utf-8') as f:
-        f.write("Consolidated News\n")
-        f.write("="*80 + "\n\n")
-    
-    # Create a new consolidated file
-    with open(local_dir, 'w', encoding='utf-8') as f:
         f.write("Consolidated News\n")
         f.write("="*80 + "\n\n")
 
@@ -195,7 +182,7 @@ def process_news_from_directory(input_directory, consolidated_file_path, local_d
                 title, date, content = extract_news_content(real_url)
                 if content:
                     print(f"Content extracted from the news article ({title[:30]}...)\n")
-                    save_to_consolidated_file(title, date, content, consolidated_file_path, local_dir)
+                    save_to_consolidated_file(title, date, content, consolidated_file_path)
                 else:
                     print(f"Could not extract content for the news article at {real_url}\n")
             else:
@@ -204,4 +191,4 @@ def process_news_from_directory(input_directory, consolidated_file_path, local_d
     print(f"Consolidated file saved at: {consolidated_file_path}")
 
 # Example usage:
-#process_news_from_directory("/home/lourdes22/data-pipeline/files", "/home/lourdes22/data-pipeline/files/consolidated_news_output.txt")
+#process_news_from_directory("/home/lourdes22/data-pipeline/files", "/home/lourdes22/data-pipeline/files/consolidated_news_output.txt", "/home/lourdes22/data-pipeline/files/consolidated_news_output.txt")

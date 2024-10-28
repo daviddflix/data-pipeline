@@ -2,10 +2,15 @@ import os
 import requests
 from typing import List
 from datetime import timedelta, datetime
+from dotenv import load_dotenv
 
-# Load environment variables from the .env file (si aplica)
-COINGECKO_API_KEY = 'CG-xXCJJaHa7QmvQNWyNheKmSfG'
-BASE_URL = 'https://pro-api.coingecko.com/api/v3'
+# Load the environment variables from the .env file
+load_dotenv()
+
+# Load environment variables from the .env file
+COINGECKO_API_KEY = os.getenv('COINGECKO_API_KEY')
+BASE_URL = os.getenv('BASE_URL')
+
 headers = {
     "Content-Type": "application/json",
     "x-cg-pro-api-key": COINGECKO_API_KEY,
