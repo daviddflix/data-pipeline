@@ -44,8 +44,8 @@ services:
     ports:
       - "8080:8080"  # Expose port 8080 for the web server
     command: "airflow webserver"  # Command to run the Airflow web server
-    volumes:
-      - /home/lourdes22/data-pipeline/files:/opt/airflow/files
+    #volumes:
+     # - /home/lourdes22/data-pipeline/files:/opt/airflow/files
     networks:
       - airflow  # Connect to the 'airflow' network
     healthcheck:
@@ -64,9 +64,8 @@ services:
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow  # Database connection string
       AIRFLOW__CORE__EXECUTOR: LocalExecutor  # Set the executor type
       AIRFLOW__WEBSERVER__SECRET_KEY: "0506"  # Set a secret key for the webserver
-    command: "airflow scheduler"  # Command to run the Airflow scheduler
-    volumes:
-      - /home/lourdes22/data-pipeline/files:/opt/airflow/files 
+    #volumes:
+      #- /home/lourdes22/data-pipeline/files:/opt/airflow/files 
     networks:
       - airflow  # Connect to the 'airflow' network
     healthcheck:
@@ -84,8 +83,8 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor  # Set the executor type
       AIRFLOW__WEBSERVER__SECRET_KEY: "0506"  # Set a secret key for the webserver
     command: "airflow celery worker"  # Command to run the Celery worker
-    volumes:
-      - /home/lourdes22/data-pipeline/files:/opt/airflow/files
+    #volumes:
+     # - /home/lourdes22/data-pipeline/files:/opt/airflow/files
     networks:
       - airflow  # Connect to the 'airflow' network
     healthcheck:

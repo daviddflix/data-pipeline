@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
 USER root
 
 # Copy the DAG files from the local directory to the appropriate directory in the container
-COPY ./dags /opt/airflow/dags
+#COPY ./dags /opt/airflow/dags
 
 # Copy the custom shell script into the container
 COPY folder.sh /opt/airflow/folder.sh
