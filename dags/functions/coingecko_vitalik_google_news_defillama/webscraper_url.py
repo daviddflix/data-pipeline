@@ -112,7 +112,6 @@ class WebScraper:
                     }, f, ensure_ascii=False, indent=4)
             else:  #Default to txt
                 filename =  f"/opt/airflow/dags/files/webscraper/{base_filename}.txt"
-            local_path = os.path.join('/opt/airflow/files/', f'{base_filename}.txt')
             with open(filename, 'w', encoding='utf-8') as f:    
                 f.write(f"URL: {self.url}\n\n")
                 f.write(f"Content:\n{response[0]}\n\n")
@@ -121,14 +120,6 @@ class WebScraper:
                 f.write(f"Entries:\n{response[3]}\n")
             
             self.logger(f"Response saved to file: {filename}")
-            with open(local_path, 'w', encoding='utf-8') as f:    
-                f.write(f"URL: {self.url}\n\n")
-                f.write(f"Content:\n{response[0]}\n\n")
-                f.write(f"Links:\n{', '.join(response[1])}\n\n")
-                f.write(f"Error:\n{response[2]}\n\n")
-                f.write(f"Entries:\n{response[3]}\n")
-            
-            self.logger(f"Response saved to file: {local_path}")
         except Exception as e:
             error_message = f"Error saving response to file: {e}"
             self.logger(error_message)

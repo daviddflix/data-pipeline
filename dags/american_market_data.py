@@ -1,7 +1,6 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
-import os
 # Import necessary functions from other scripts
 from functions.financial_market_tracker.webscarper import save_market_data_to_file
 from dags.functions.general_functions.upload_files import upload_preprocessed_files_to_vector_store
@@ -11,7 +10,7 @@ from functions.financial_market_tracker.slack_bot import post_file_content_to_sl
 default_args = {
     'owner': 'airflow',  # Owner of the DAG
     'depends_on_past': False,  # Each task run is independent of past runs
-    'start_date': datetime(2024, 10, 29),  # Start date of the DAG
+    'start_date': datetime(2024, 10, 28),  # Start date of the DAG
     'email_on_failure': False,  # Do not send emails on task failure
     'email_on_retry': False,  # Do not send emails on task retry
     'retries': 1,  # Number of retries allowed if the task fails

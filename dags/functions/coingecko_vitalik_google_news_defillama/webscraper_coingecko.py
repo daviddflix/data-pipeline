@@ -83,14 +83,6 @@ def process_multiple_coins(coin_list: List[str], file_directory: str):
             print(result)
             file.write(result)
     print(f"All coins data saved in: {file_path}")
-    local_path = os.path.join('/opt/airflow/files/', 'all_coins_coingecko_data.txt')
-    with open(local_path, 'w') as file:
-        for coin in coin_list:
-            print(f"Processing coin: {coin}")
-            result = get_token_data(coin)
-            print(result)
-            file.write(result)
-    print(f"All coins data saved in: {file_path}")
             
             
 # List of coins to process
