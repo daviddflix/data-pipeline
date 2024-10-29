@@ -27,7 +27,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    env_file: .env
     environment:
       AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
@@ -62,7 +61,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    env_file: .env
     environment:
       AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
