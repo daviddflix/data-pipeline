@@ -56,15 +56,18 @@ def get_stock_price(symbol, stock):
         month_price_start = month_prices[0]  # Price at the start of the month
         month_change = ((current_price - month_price_start) / month_price_start) * 100 if month_price_start else None
         month_change_str = f"{month_change:.2f}%" if month_change else "Unavailable"
-
+        if symbol in american_market_indices.values():
+            price_prefix = "$"  # Añadir el símbolo de dólar
+        else:
+            price_prefix = ""  # Sin símbolo de dólar
         # Construct the message
         response = (
-            f"💰 **Current Price of {stock}** 💰\n"
-            f"💲 **Price:** **${current_price:.2f}**\n"
-            f"📊 **Day Change:** {day_change_str}\n"
-            f"📅 **Weekly Change:** {week_change_str}\n"
-            f"🗓️ **Monthly Change:** {month_change_str}\n"
-            f"Stay up-to-date with market trends! 💼📈"
+        f"💰 **Current Price of {stock}** 💰\n"
+        f"💲 **Price:** **{price_prefix}{current_price:.2f}**\n"
+        f"📊 **Day Change:** {day_change_str}\n"
+        f"📅 **Weekly Change:** {week_change_str}\n"
+        f"🗓️ **Monthly Change:** {month_change_str}\n"
+        f"Stay up-to-date with market trends! 💼📈"
         )
         return response
     else:
