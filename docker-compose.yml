@@ -49,11 +49,11 @@ services:
                      airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.com &&
                      airflow webserver"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      test: ["CMD", "curl",  "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 1m
 
   scheduler:
     build:
@@ -72,5 +72,20 @@ services:
       - ./plugins:/opt/airflow/plugins
     command: airflow scheduler
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "http"
+      - "--domain=${NGROK_DOMAIN}"
+      - "webserver:8080"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - webserver
+    ports:
+      - "4044:4040"
+
 volumes:
   pgadmin_data:
+  
