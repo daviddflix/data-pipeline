@@ -21,6 +21,8 @@ jobs:
       SLACK_APP_TOKEN: ${{ secrets.SLACK_APP_TOKEN }}
       PGADMIN_DEFAULT_EMAIL: ${{ secrets.PGADMIN_DEFAULT_EMAIL }}
       PGADMIN_DEFAULT_PASSWORD:  ${{ secrets.PGADMIN_DEFAULT_PASSWORD }}
+      NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+      NGROK_DOMAIN: ${{ secrets.NGROK_DOMAIN }} 
     steps:
     - uses: actions/checkout@v4
     - name: Trigger deployment
