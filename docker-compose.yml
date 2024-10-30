@@ -83,6 +83,7 @@ services:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     depends_on:
       - webserver
+      - scheduler
     ports:
       - "4044:4040"
 
