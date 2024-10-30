@@ -27,6 +27,10 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
+    run: |
+          echo "Checking if environment variables are set (will show as masked if present):"
+          echo "POSTGRES_USER is: $POSTGRES_USER"
+          echo "POSTGRES_DB is: $POSTGRES_DB
     environment:
       AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
@@ -86,7 +90,7 @@ services:
       - scheduler
     ports:
       - "4044:4040"
-
+        
 volumes:
   pgadmin_data:
   
