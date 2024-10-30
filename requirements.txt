@@ -1,3 +1,9 @@
 beautifulsoup4
 requests
 feedparser
+pandas
+openai
+python-dotenv
+alpha_vantage
+yfinance
+timedelta

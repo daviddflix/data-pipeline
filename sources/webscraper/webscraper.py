@@ -1,4 +1,4 @@
-# webscraper.py
+#webscraper.py
 
 import os
 import json
@@ -40,7 +40,7 @@ class WebScraper:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.5',
             'Referer': 'https://www.google.com/',
-            'DNT': '1',  # Do Not Track Request Header
+            'DNT': '1',  #Do Not Track Request Header
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1'
         }
@@ -49,21 +49,21 @@ class WebScraper:
         try:
             self.logger(f"Starting scrape for URL: {self.url}")
             
-            # Check if the URL is an RSS feed
+            #Check if the URL is an RSS feed
             if self.url.endswith('.rss') or 'rss' in self.url:
                 result = self.scrape_rss()
                 if self.save_to_file:
                     self.save_response_to_file(result)
                 return result
             
-            # if the url is not an RSS feed, then it is a normal web page and continue the scraping
+            #if the url is not an RSS feed, then it is a normal web page and continue the scraping
 
             response = requests.get(
                 self.url,
                 headers=self.headers,
                 timeout=15,
                 allow_redirects=True,
-                verify=True  # Verify SSL certificates
+                verify=True  #Verify SSL certificates
             )
             response.raise_for_status()
 
@@ -112,7 +112,7 @@ class WebScraper:
                         "Error": response[2],
                         "Entries": response[3]
                     }, f, ensure_ascii=False, indent=4)
-            else:  # Default to txt
+            else:  #Default to txt
                 filename = os.path.join("sources", "webscraper", "files", f"{base_filename}.txt")
             with open(filename, 'w', encoding='utf-8') as f:    
                 f.write(f"URL: {self.url}\n\n")
@@ -130,7 +130,7 @@ class WebScraper:
         self.logger("Parsing content with BeautifulSoup HTML")
         soup = BeautifulSoup(html_content, 'html.parser')
         
-        # Extract metadata
+        #Extract metadata
         metadata = {
             'title': soup.title.string if soup.title else None,
             'meta_description': soup.find('meta', attrs={'name': 'description'})['content'] if soup.find('meta', attrs={'name': 'description'}) else None,
@@ -138,11 +138,11 @@ class WebScraper:
             'og_description': soup.find('meta', property='og:description')['content'] if soup.find('meta', property='og:description') else None,
         }
         
-        # Extract main content
+        #Extract main content
         content = soup.get_text(separator='\n', strip=True)
         self.logger(f"Parsed content length: {len(content)} characters")
         
-        # Extract links
+        #Extract links
         self.logger("Starting link extraction")
         base_url = self.url
         links = []
@@ -156,7 +156,7 @@ class WebScraper:
             })
         self.logger(f"Number of links extracted: {len(links)}")
 
-        # Extract images
+        #Extract images
         self.logger("Starting image extraction")
         images = []
         for img in soup.find_all('img', src=True):
@@ -171,7 +171,7 @@ class WebScraper:
             })
         self.logger(f"Number of images extracted: {len(images)}")
         
-        # Extract structured data
+        #Extract structured data
         structured_data = []
         for script in soup.find_all('script', type='application/ld+json'):
             try:
@@ -180,10 +180,10 @@ class WebScraper:
             except json.JSONDecodeError:
                 self.logger("Error decoding JSON-LD")
         
-        # Extract headings
+        #Extract headings
         headings = [{'level': int(tag.name[1]), 'text': tag.get_text(strip=True)} for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
         
-        # Compile all extracted data
+        #Compile all extracted data
         extracted_data = {
             'metadata': metadata,
             'content': content,
@@ -209,26 +209,26 @@ class WebScraper:
             return "", [], error_message, []
 
     def scrape_rss(self) -> Tuple[str, List[str], None, List[Dict[str, Any]]]:
-        # Log the start of RSS feed scraping
+        #Log the start of RSS feed scraping
         self.logger(f"Scraping RSS feed: {self.url}")
         
-        # Parse the RSS feed using feedparser
+        #Parse the RSS feed using feedparser
         feed = feedparser.parse(self.url)
         
-        # Log successful parsing and number of entries
+        #Log successful parsing and number of entries
         self.logger(f"Feed parsed successfully")
         self.logger(f"Number of entries: {len(feed.entries)}")
         
-        # Convert the entire feed to a string for content
+        #Convert the entire feed to a string for content
         content = str(feed)
         
-        # Extract links from entries, if available
+        #Extract links from entries, if available
         links = [entry.link for entry in feed.entries if 'link' in entry]
         
-        # Store all entries
+        #Store all entries
         entries = feed.entries
         
-        # If there are entries, log details of the first 5 (if available)
+        #If there are entries, log details of the first 5 (if available)
         if entries:
             self.logger("First 5 entries (if available):")
             for entry in entries[:5]:
@@ -237,7 +237,7 @@ class WebScraper:
                 self.logger(f"Published: {entry.get('published', 'N/A')}")
                 self.logger("---")
         
-        # Return the scraped data: content, links, error (None in this case), and entries
+        #Return the scraped data: content, links, error (None in this case), and entries
         return content, links, None, entries
 
 
@@ -250,7 +250,7 @@ def main():
     url_5 = 'https://www.bloomberg.com/markets/stocks'
     url_6 = 'https://in.investing.com/news/cryptocurrency-news/3-things-bitcoin-btc-needs-to-hit-60000-4422485'
 
-    scraper = WebScraper(url_2, verbose=True, save_to_file=True, save_format='json')  # Enable verbose mode for debugging
+    scraper = WebScraper(url_2, verbose=True, save_to_file=True, save_format='json')  #Enable verbose mode for debugging
     scraper.scrape()
 
 if __name__ == "__main__":
