@@ -27,14 +27,15 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
+    env_file: .env
     environment:
-      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
-      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
       AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__WEBSERVER__ENABLE_HEALTH_CHECK: 'true'
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
