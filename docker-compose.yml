@@ -33,8 +33,8 @@ services:
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__WEBSERVER__ENABLE_HEALTH_CHECK: 'true'
-      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
-      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN:-}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
+      SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
