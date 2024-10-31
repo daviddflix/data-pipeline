@@ -10,10 +10,10 @@ load_dotenv()
 # Configure logging to display info-level messages in the console
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-token=os.getenv("SLACK_BOT_TOKEN")
-print(token)
+
 # Instantiate a Slack client using the bot token stored in the SLACK_BOT_TOKEN environment variable
-client = WebClient(token=token)
+client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
+
 def post_file_content_to_slack(file_path, channel_id="C07SW82KU0Z"):
     """
     Reads the content of a text file and posts it to a Slack channel.

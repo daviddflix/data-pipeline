@@ -39,8 +39,6 @@ jobs:
         git pull origin main
         # Function to start containers
         start_containers() {
-          export SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN
-          export SLACK_APP_TOKEN=$SLACK_APP_TOKEN
           docker-compose -f docker-compose.yml -p data-pipeline up -d --build
           return $?
         }
