@@ -23,6 +23,7 @@ USER root
 # Copy the DAG files from the local directory to the appropriate directory in the container
 COPY ./dags /opt/airflow/dags
 
+# Create necessary directories and set permissions
 RUN mkdir -p /opt/airflow/dags/files/webscraper && \
     mkdir -p /opt/airflow/dags/files/preprocessed && \
     chmod -R 777 /opt/airflow/dags/files 
