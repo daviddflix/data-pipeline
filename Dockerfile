@@ -1,32 +1,37 @@
-FROM apache/airflow:2.5.0
+FROM apache/airflow:2.5.0 
 
 # Switch to root user to perform updates and install packages
 USER root
 
-# Update package list and install required packages
+# Update the package list and install required packages
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev
+    build-essential \ 
+    libpq-dev         
 
-# Create the required directories with proper ownership
 RUN mkdir -p /opt/airflow/dags/files/webscraper \
     && mkdir -p /opt/airflow/dags/files/preprocessed \
-    && chown -R airflow:root /opt/airflow/dags/files \
     && chmod -R 777 /opt/airflow/dags/files
 
-# Copy the requirements.txt file
-COPY --chown=airflow:root requirements.txt /opt/airflow/requirements.txt
-
-# Switch to airflow user to install Python dependencies
+# Switch to the airflow user to install Python packages
 USER airflow
+
+# Copy the requirements.txt file into the container
+COPY requirements.txt /opt/airflow/requirements.txt
+
+# Install the Python dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
 
-# Switch back to root to copy DAGs
+# Switch back to root user to create directories and change permissions
 USER root
-COPY --chown=airflow:root ./dags /opt/airflow/dags/
 
-# Final permissions check and setup
-RUN chmod -R 777 /opt/airflow/dags/files
+# Copy the DAG files from the local directory to the appropriate directory in the container
+COPY ./dags /opt/airflow/dags
 
-# Switch back to airflow user for running the container
-USER airflow
+# Copy the custom shell script into the container
+COPY folder.sh /opt/airflow/folder.sh
+
+# Ensure the shell script has executable permissions
+RUN chmod +x /opt/airflow/folder.sh
+
+# Execute the shell script to create necessary folders during the image build process
+RUN /opt/airflow/folder.sh
