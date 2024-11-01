@@ -33,5 +33,3 @@ RUN echo "Verificando directorios finales:" && \
     echo "Contenido de webscraper:" && \
     ls -la /opt/airflow/dags/files/webscraper/
 
-# Switch back to airflow user
-USER airflow
