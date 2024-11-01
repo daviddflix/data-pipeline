@@ -25,6 +25,5 @@ COPY ./dags /opt/airflow/dags
 
 RUN mkdir -p /opt/airflow/dags/files/webscraper && \
     mkdir -p /opt/airflow/dags/files/preprocessed && \
-    chmod -R 777 /opt/airflow/dags/files && \
-    chown -R airflow:root /opt/airflow/dags/files
+    chmod -R 777 /opt/airflow/dags/files
 
