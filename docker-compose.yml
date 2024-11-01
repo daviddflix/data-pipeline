@@ -40,7 +40,6 @@ services:
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
     volumes:
-      - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
     ports:
@@ -48,14 +47,6 @@ services:
     command: bash -c "airflow db init &&
                      airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.com &&
                      airflow webserver"
-    entrypoint: >
-      /bin/bash -c "
-        mkdir -p /opt/airflow/dags/files/webscraper &&
-        mkdir -p /opt/airflow/dags/files/preprocessed &&
-        chown -R airflow:root /opt/airflow/dags/files &&
-        chmod -R 777 /opt/airflow/dags/files &&
-        airflow webserver
-      "
     healthcheck:
       test: ["CMD", "curl",  "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -82,17 +73,8 @@ services:
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
     volumes:
-      - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    entrypoint: >
-      /bin/bash -c "
-        mkdir -p /opt/airflow/dags/files/webscraper &&
-        mkdir -p /opt/airflow/dags/files/preprocessed &&
-        chown -R airflow:root /opt/airflow/dags/files &&
-        chmod -R 777 /opt/airflow/dags/files &&
-        airflow scheduler
-      "
     command: airflow scheduler
 
   ngrok:
