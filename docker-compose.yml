@@ -39,9 +39,6 @@ services:
       BASE_URL: ${BASE_URL}
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
-    volumes:
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
     ports:
       - "8080:8080"
     command: bash -c "airflow db init &&
@@ -72,9 +69,6 @@ services:
       BASE_URL: ${BASE_URL}
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${SLACK_APP_TOKEN}
-    volumes:
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
     command: airflow scheduler
 
   ngrok:
