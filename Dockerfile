@@ -28,8 +28,3 @@ RUN mkdir -p /opt/airflow/dags/files/webscraper && \
     chmod -R 777 /opt/airflow/dags/files && \
     chown -R airflow:root /opt/airflow/dags/files
 
-RUN echo "Verificando directorios finales:" && \
-    ls -la /opt/airflow/dags/files/ && \
-    echo "Contenido de webscraper:" && \
-    ls -la /opt/airflow/dags/files/webscraper/
-
