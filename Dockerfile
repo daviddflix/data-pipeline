@@ -27,12 +27,3 @@ USER root
 
 # Copy the DAG files from the local directory to the appropriate directory in the container
 COPY ./dags /opt/airflow/dags
-
-# Copy the custom shell script into the container
-COPY folder.sh /opt/airflow/folder.sh
-
-# Ensure the shell script has executable permissions
-RUN chmod +x /opt/airflow/folder.sh
-
-# Execute the shell script to create necessary folders during the image build process
-RUN /opt/airflow/folder.sh
