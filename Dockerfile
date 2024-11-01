@@ -17,9 +17,6 @@ COPY requirements.txt /opt/airflow/requirements.txt
 # Install the Python dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r /opt/airflow/requirements.txt
 
-# Switch back to root user to create directories and change permissions
-USER root
-
 # Copy the DAG files from the local directory to the appropriate directory in the container
 COPY ./dags /opt/airflow/dags
 
