@@ -7,11 +7,6 @@ USER root
 RUN apt-get update && apt-get install -y \
     build-essential \ 
     libpq-dev 
-    
-RUN mkdir -p /opt/airflow/dags/files/webscraper && \
-    mkdir -p /opt/airflow/dags/files/preprocessed && \
-    chmod -R 777 /opt/airflow/dags/files && \
-    chown -R airflow:root /opt/airflow/dags/files
 
 # Switch to the airflow user to install Python packages
 USER airflow
@@ -27,3 +22,8 @@ USER root
 
 # Copy the DAG files from the local directory to the appropriate directory in the container
 COPY ./dags /opt/airflow/dags
+
+RUN mkdir -p /opt/airflow/dags/files/webscraper && \
+    mkdir -p /opt/airflow/dags/files/preprocessed && \
+    chmod -R 777 /opt/airflow/dags/files && \
+    chown -R airflow:root /opt/airflow/dags/files
