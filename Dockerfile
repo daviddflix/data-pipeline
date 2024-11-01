@@ -8,10 +8,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \ 
     libpq-dev         
 
-RUN mkdir -p /opt/airflow/dags/files/webscraper \
-    && mkdir -p /opt/airflow/dags/files/preprocessed \
-    && chmod -R 777 /opt/airflow/dags/files
-
 # Switch to the airflow user to install Python packages
 USER airflow
 
