@@ -25,5 +25,10 @@ COPY ./dags /opt/airflow/dags
 
 RUN mkdir -p /opt/airflow/dags/files/webscraper && \
     mkdir -p /opt/airflow/dags/files/preprocessed && \
-    chmod -R 777 /opt/airflow/dags/files
+    chmod -R 777 /opt/airflow/dags/files 
+
+RUN echo "Verificando directorios finales:" && \
+    ls -la /opt/airflow/dags/files/ && \
+    echo "Contenido de webscraper:" && \
+    ls -la /opt/airflow/dags/files/webscraper/
 
