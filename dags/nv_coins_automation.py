@@ -34,7 +34,7 @@ with DAG(
 
     # Task to extract and save European market data
     def nv_coins_automation_py():
-        search_param = ""
+        search_param = "master sheet"
         formatted_json = get_formatted_board_items(search_param)
         print("The results have been saved in 'board_items.json'")
     
