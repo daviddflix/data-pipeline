@@ -44,7 +44,7 @@ def get_all_boards(search_param, board_kind='private'):
           - 'success' (bool): True if the operation was successful, False otherwise.
           - 'data' (list or None): A list of boards if successful, else None.
     """
-    
+    print(search_param, board_kind)
     query = f"""
     query {{
       boards(board_kind: {board_kind}, limit: 200) {{
