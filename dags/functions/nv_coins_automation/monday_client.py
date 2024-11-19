@@ -8,6 +8,8 @@ import json
 from ast import literal_eval
 from monday.exceptions import MondayError
 
+
+
 MONDAY_API_KEY_NOVATIDE = os.getenv("MONDAY_API_KEY_NOVATIDE")
 
 monday_client = MondayClient(MONDAY_API_KEY_NOVATIDE)
@@ -25,7 +27,7 @@ def SUM(*args):
 # ---------------------------- NV BOT ----------------------
 
 # Get all private board, if search param is passed, the board that match the param will be return
-def get_all_boards(search_param, board_kind='private'):
+def get_all_boards(search_param=None, board_kind='private'):
     """
     Retrieve all private boards, with optional filtering by a search parameter.
 
@@ -44,6 +46,7 @@ def get_all_boards(search_param, board_kind='private'):
           - 'success' (bool): True if the operation was successful, False otherwise.
           - 'data' (list or None): A list of boards if successful, else None.
     """
+    
     query = f"""
     query {{
       boards(board_kind: {board_kind}, limit: 200) {{
@@ -65,7 +68,7 @@ def get_all_boards(search_param, board_kind='private'):
         response.raise_for_status()  # Check for HTTP errors
 
         data = response.json()
-        print(data)
+
         # Check for errors in the response
         if 'errors' in data:
             result['error'] = data['errors']
@@ -879,23 +882,23 @@ def get_formatted_board_items(search_param):
     return json.dumps(result, indent=2)
 
 # Ejemplo de uso
-#def main():
-#    search_param = ""
-#    formatted_json = get_formatted_board_items(search_param)
-#    print("The results have been saved in 'board_items.json'")
-#
-#    with open('all_boards_data.json', 'r') as f:
-#        json_data = json.load(f)
-#
-#    # Update prices and Monday.com
-#    updated_json = update_coin_prices(json_data, MONDAY_API_KEY_NOVATIDE)
-#
-#    # Clear the JSON to make it ready for the next use
-#    with open('all_boards_data.json', 'w') as f:
-#        json.dump({"boards": []}, f, indent=2)  # Save an empty object
-#
-#    print("The JSON has been cleared and is ready for the next use.")
-#    print(f"Number of calls made to Coingecko: {coingecko_calls}")  # Informative print
-#
-#if __name__ == "__main__":
-#    main()
+def main():
+    search_param = "master sheet"
+    formatted_json = get_formatted_board_items(search_param)
+    print("The results have been saved in 'board_items.json'")
+
+    with open('all_boards_data.json', 'r') as f:
+        json_data = json.load(f)
+
+    # Update prices and Monday.com
+    updated_json = update_coin_prices(json_data, MONDAY_API_KEY_NOVATIDE)
+
+    # Clear the JSON to make it ready for the next use
+    with open('all_boards_data.json', 'w') as f:
+        json.dump({"boards": []}, f, indent=2)  # Save an empty object
+
+    print("The JSON has been cleared and is ready for the next use.")
+    print(f"Number of calls made to Coingecko: {coingecko_calls}")  # Informative print
+
+if __name__ == "__main__":
+    main()
