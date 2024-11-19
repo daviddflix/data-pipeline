@@ -7,8 +7,7 @@ import requests
 import json
 from ast import literal_eval
 from monday.exceptions import MondayError
-
-
+coingecko_calls = 0
 MONDAY_API_KEY_NOVATIDE= "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjQzNjc0MjU0NiwiYWFpIjoxMSwidWlkIjo1NTg4NDc5NywiaWFkIjoiMjAyNC0xMS0xNFQxNTozNjowOS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MjA1NDExNDcsInJnbiI6ImV1YzEifQ.Db6GstZ96mxkzoYM33Z2AR_nDXg5sl0Ggec7Zj6t1tc"
 
 monday_client = MondayClient(MONDAY_API_KEY_NOVATIDE)
@@ -826,7 +825,7 @@ def get_formatted_board_items(search_param):
     """
     # Get the board information and its items
     board_result = search_and_get_board_items(search_param)
-    print(board_result)
+
     # Check if board_result is valid
     if board_result is None or 'board_items' not in board_result:
         print("Error: Board result is None or does not contain 'board_items'.")
