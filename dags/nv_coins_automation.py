@@ -7,7 +7,7 @@ load_dotenv()
 import os
 # Import necessary functions from external scripts
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
-from functions.nv_coins_automation.monday_client import get_coin_prices
+#from functions.nv_coins_automation.monday_client import get_coin_prices
 from functions.nv_coins_automation.monday_client import update_coin_prices
 
 MONDAY_API_KEY_NOVATIDE = os.getenv("MONDAY_API_KEY_NOVATIDE")
