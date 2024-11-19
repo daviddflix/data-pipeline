@@ -7,7 +7,7 @@ load_dotenv()
 import os
 # Import necessary functions from external scripts
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
-#from functions.nv_coins_automation.monday_client import get_coin_prices
+from functions.nv_coins_automation.monday_client import get_coin_prices
 from functions.nv_coins_automation.monday_client import update_coin_prices
 
 MONDAY_API_KEY_NOVATIDE = os.getenv("MONDAY_API_KEY_NOVATIDE")
@@ -34,7 +34,7 @@ with DAG(
 
     # Task to extract and save European market data
     def nv_coins_automation_py():
-        search_param = "master sheet"
+        search_param = "Master sheet"
         formatted_json = get_formatted_board_items(search_param)
         print("The results have been saved in 'board_items.json'")
     
@@ -49,7 +49,7 @@ with DAG(
             json.dump({"boards": []}, f, indent=2)  # Save an empty object
     
         print("The JSON has been cleared and is ready for the next use.")
-        #print(f"Number of calls made to Coingecko: {get_coin_prices.coingecko_calls}")  # Informative print
+        print(f"Number of calls made to Coingecko: {get_coin_prices.coingecko_calls}")  # Informative print
     
     # Create the PythonOperator task to extract European market closing data
     nv_coins_automation = PythonOperator(
