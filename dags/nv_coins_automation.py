@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv() 
 import os
 # Import necessary functions from external scripts
-from functions.financial_market_tracker.webscarper import get_formatted_board_items
+from functions.nv_coins_automation.monday_client import get_formatted_board_items
 from functions.nv_coins_automation.monday_client import coingecko_calls
 from functions.nv_coins_automation.monday_client import update_coin_prices
 
