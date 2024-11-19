@@ -25,7 +25,7 @@ def SUM(*args):
 # ---------------------------- NV BOT ----------------------
 
 # Get all private board, if search param is passed, the board that match the param will be return
-def get_all_boards(search_param=None, board_kind='private'):
+def get_all_boards(search_param, board_kind='private'):
     """
     Retrieve all private boards, with optional filtering by a search parameter.
 
