@@ -7,7 +7,6 @@ load_dotenv()
 import os
 # Import necessary functions from external scripts
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
-from functions.nv_coins_automation.monday_client import get_coin_prices
 from functions.nv_coins_automation.monday_client import update_coin_prices
 
 MONDAY_API_KEY_NOVATIDE = os.getenv("MONDAY_API_KEY_NOVATIDE")
@@ -34,6 +33,7 @@ with DAG(
 
     # Task to extract and save European market data
     def nv_coins_automation_py():
+        print(MONDAY_API_KEY_NOVATIDE)
         search_param = "Master sheet"
         formatted_json = get_formatted_board_items(search_param)
         print("The results have been saved in 'board_items.json'")
