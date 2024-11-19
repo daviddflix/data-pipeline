@@ -49,7 +49,7 @@ with DAG(
             json.dump({"boards": []}, f, indent=2)  # Save an empty object
     
         print("The JSON has been cleared and is ready for the next use.")
-        print(f"Number of calls made to Coingecko: {get_coin_prices.coingecko_calls}")  # Informative print
+        #print(f"Number of calls made to Coingecko: {get_coin_prices.coingecko_calls}")  # Informative print
     
     # Create the PythonOperator task to extract European market closing data
     nv_coins_automation = PythonOperator(
