@@ -1,14 +1,14 @@
 import os
 import time 
-from monday import MondayClient
-from dotenv import load_dotenv
-load_dotenv() 
+from monday import MondayClient 
 import requests
 import json
 from ast import literal_eval
 from monday.exceptions import MondayError
-coingecko_calls = 0
-MONDAY_API_KEY_NOVATIDE= "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjQzNjc0MjU0NiwiYWFpIjoxMSwidWlkIjo1NTg4NDc5NywiaWFkIjoiMjAyNC0xMS0xNFQxNTozNjowOS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MjA1NDExNDcsInJnbiI6ImV1YzEifQ.Db6GstZ96mxkzoYM33Z2AR_nDXg5sl0Ggec7Zj6t1tc"
+from dotenv import load_dotenv
+load_dotenv()
+
+MONDAY_API_KEY_NOVATIDE = os.getenv('MONDAY_API_KEY_NOVATIDE')
 
 monday_client = MondayClient(MONDAY_API_KEY_NOVATIDE)
 monday_url = "https://api.monday.com/v2"
