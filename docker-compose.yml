@@ -43,7 +43,7 @@ services:
     ports:
       - "8080:8080"
     command: bash -c "airflow db init &&
-                     airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.com &&
+                     airflow users create --username novatidelabs --password data-pipeline22 --firstname Anonymous --lastname Admin --role Admin --email admin@example.com &&
                      airflow webserver"
     healthcheck:
       test: ["CMD", "curl",  "-f", "http://localhost:8080/health"]
