@@ -5,9 +5,14 @@ import json
 from dotenv import load_dotenv
 load_dotenv() 
 import os
+from pytz import timezone
+
 # Import necessary functions from external scripts
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
 from functions.nv_coins_automation.monday_client import update_coin_prices
+
+# Define the U.K. time zone
+uk_tz = timezone('Europe/London')
 
 MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
 
@@ -15,7 +20,6 @@ MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
 default_args = {
     'owner': 'airflow',  # Owner of the DAG
     'depends_on_past': False,  # Task runs are independent of past runs
-    'start_date': datetime(2024, 11, 19),  # The start date for the DAG
     'email_on_failure': False,  # No emails on failure
     'email_on_retry': False,  # No emails on retries
     'retries': 1,  # Number of retry attempts if the task fails
@@ -27,7 +31,8 @@ with DAG(
     'nv_coins_automation',  # Name of the DAG
     default_args=default_args,  # Use the default arguments defined above
     description='DAG for nv coins automation',  # Short description of the DAG
-    schedule_interval='0 16 * * 1-5',  # Schedule to run at 4:00 PM UTC, Monday to Friday
+    schedule_interval='0 12,0 * * *',  # Runs at 12:00 PM and 12:00 AM UTC (adjusted for UK time)
+    start_date=datetime(2024, 11, 20, tzinfo=uk_tz),
     catchup=False  # No backfilling for missed tasks
 ) as dag:
 
