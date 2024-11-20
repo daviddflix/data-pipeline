@@ -9,7 +9,7 @@ import os
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
 from functions.nv_coins_automation.monday_client import update_coin_prices
 
-MONDAY_API_KEY_NOVATIDE = os.getenv('MONDAY_API_KEY_NOVATIDE')
+MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
 
 # Define default arguments for the DAG
 default_args = {

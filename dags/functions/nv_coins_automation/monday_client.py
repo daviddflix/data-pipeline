@@ -8,7 +8,7 @@ from monday.exceptions import MondayError
 from dotenv import load_dotenv
 load_dotenv()
 
-MONDAY_API_KEY_NOVATIDE = os.getenv('MONDAY_API_KEY_NOVATIDE')
+MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
 
 monday_client = MondayClient(MONDAY_API_KEY_NOVATIDE)
 monday_url = "https://api.monday.com/v2"
