@@ -38,22 +38,21 @@ with DAG(
 
     # Task to extract and save European market data
     def nv_coins_automation_py():
-        search_param = "Master sheet"
+        search_param = "master sheet"
         formatted_json = get_formatted_board_items(search_param)
         print("The results have been saved in 'board_items.json'")
-    
+
         with open('all_boards_data.json', 'r') as f:
             json_data = json.load(f)
-    
+
         # Update prices and Monday.com
-        updated_json = update_coin_prices(json_data, MONDAY_API_KEY_NOVATIDE)
-    
+        updated_json = update_coin_prices(json_data)
+
         # Clear the JSON to make it ready for the next use
         with open('all_boards_data.json', 'w') as f:
             json.dump({"boards": []}, f, indent=2)  # Save an empty object
-    
+
         print("The JSON has been cleared and is ready for the next use.")
-        #print(f"Number of calls made to Coingecko: {get_coin_prices.coingecko_calls}")  # Informative print
     
     # Create the PythonOperator task to extract European market closing data
     nv_coins_automation = PythonOperator(

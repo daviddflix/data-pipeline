@@ -525,20 +525,24 @@ def change_column_value(item_id, board_id, column_id, value):
     print(f"Column ID: {column_id}")
     print(f"New Value: {value}")
 
-    # Wrap the value in quotes and escape any existing quotes
-    value = json.dumps(value)
-    
+    # If the value is a dictionary, extract the 'usd' value
+    if isinstance(value, dict) and 'usd' in value:
+        value = value['usd']
+
+    # Convert the value to a string and escape it properly
+    value = json.dumps(str(value))
+
     mutation_query = f'''
-        mutation {{
-            change_simple_column_value(
-                item_id: {item_id},
-                board_id: {board_id},
-                column_id: "{column_id}",
-                value: "{value}"
-            ) {{
-                id
-            }}
+    mutation {{
+        change_simple_column_value(
+            item_id: {item_id},
+            board_id: {board_id},
+            column_id: "{column_id}",
+            value: {value}
+        ) {{
+            id
         }}
+    }}
     '''
 
     try:
@@ -546,8 +550,8 @@ def change_column_value(item_id, board_id, column_id, value):
         print('Change column value response', response.content)
         response_data = response.json()
         
-        if 'error_code' in response_data:
-            error_message = response_data['error_message']
+        if 'errors' in response_data:
+            error_message = response_data['errors'][0]['message']
             print(f'Error changing column value: {error_message}')
             return False
         elif 'data' in response_data:
@@ -556,10 +560,10 @@ def change_column_value(item_id, board_id, column_id, value):
         else:
             print('Unexpected response format')
             return False
-
     except Exception as e:
         print(f'Error found changing column value: {str(e)}')
         return False
+
 
 def write_new_update(item_id, value):
     """
@@ -650,25 +654,35 @@ def get_coin_list(api_key):
     except requests.RequestException as e:
         print(f"Error al obtener la lista de monedas: {e}")
         return {}
-
-def get_coin_prices(api_key: str, coins: list) -> dict:
-    global coingecko_calls
-
-    coin_map = get_coin_list(api_key)
     
+    
+def get_coin_prices(api_key: str, coins: list) -> dict:
+    coin_map = get_coin_list(api_key)
     symbol_to_id = {}
+    
     for coin in coins:
         symbol = coin['coin_symbol'].lower()
         name = coin['coin_name'].lower()
-        if symbol in coin_map:
-            symbol_to_id[symbol] = coin_map[symbol]
-        elif name in coin_map:
-            symbol_to_id[symbol] = coin_map[name]
-    
+        
+        # New comparison method
+        match_found = False
+        for coingecko_id, coingecko_data in coin_map.items():
+            if name == coingecko_id.lower() or name == coingecko_data.lower():
+                symbol_to_id[symbol] = coingecko_id
+                match_found = True
+                break
+        
+        # If no match found, fall back to the previous method
+        if not match_found:
+            if symbol in coin_map:
+                symbol_to_id[symbol] = coin_map[symbol]
+            elif name in coin_map:
+                symbol_to_id[symbol] = coin_map[name]
+
     url = "https://pro-api.coingecko.com/api/v3/simple/price"
     prices = {}
-    
     batch_size = 50
+
     for i in range(0, len(symbol_to_id), batch_size):
         batch = list(symbol_to_id.values())[i:i+batch_size]
         params = {
@@ -680,38 +694,38 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         try:
             response = requests.get(url, params=params)
             response.raise_for_status()
-            coingecko_calls += 1 
             data = response.json()
-            
             for symbol, id in symbol_to_id.items():
                 if id in data:
                     prices[symbol] = data[id]
-            
             time.sleep(1)
         except requests.RequestException as e:
             print(f"Error al obtener datos: {e}")
-    
+
     return prices
 
-def update_coin_prices(json_data, api_key):
+
+
+def update_coin_prices(json_data):
     # Iterate through each board in the JSON data
     for board in json_data['boards']:
         coins = board['coins']  # Get the coins for the current board
         board_id = board['board_id']  # Get the board_id for the current board
-        prices = get_coin_prices(api_key, coins)  # Get prices for the coins
+        prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", coins)  # Get prices for the coins
 
         for coin in coins:
             symbol = coin['coin_symbol'].lower()
-            if symbol in prices and 'usd' in prices[symbol]:
-                # Add the updated price
-                coin['column_ids']['updated_price'] = prices[symbol]['usd']
+            if symbol in prices:
+                price = prices[symbol]
+                # Si price es un número, usarlo directamente
+                coin['column_ids']['updated_price'] = price
                 
                 # Update the price in Monday.com using the board_id of the current board
                 result = change_column_value(
                     item_id=int(coin['coin_id']),
                     board_id=int(board_id),
                     column_id=coin['column_ids']['valuation_price_column_id'],
-                    value=prices[symbol]['usd']
+                    value=price
                 )
                 
                 if result:
@@ -721,7 +735,7 @@ def update_coin_prices(json_data, api_key):
             else:
                 coin['column_ids']['updated_price'] = None
                 print(f"No se encontró precio para {coin['coin_name']} ({symbol}) en el board '{board['board_name']}'")
-
+    
     return json_data
 
 def search_and_get_board_items(search_param):
@@ -771,7 +785,6 @@ def search_and_get_board_items(search_param):
 
             # Save the result to a single JSON file after processing all boards
             save_to_json(result)
-            print(result)
             return result
         else:
             return {"error": "No boards found with that name."}
@@ -878,26 +891,23 @@ def get_formatted_board_items(search_param):
 
     return json.dumps(result, indent=2)
 
-
 # Ejemplo de uso
 #def main():
-#    search_param = "master sheet"
-#    formatted_json = get_formatted_board_items(search_param)
-#    print("The results have been saved in 'board_items.json'")
+#   search_param = "master sheet"
+#   formatted_json = get_formatted_board_items(search_param)
+#   print("The results have been saved in 'board_items.json'")
 #
-#    with open('all_boards_data.json', 'r') as f:
-#        json_data = json.load(f)
+#   with open('all_boards_data.json', 'r') as f:
+#       json_data = json.load(f)
 #
-#    # Update prices and Monday.com
-#    updated_json = update_coin_prices(json_data, MONDAY_API_KEY_NOVATIDE)
+#   # Update prices and Monday.com
+#   updated_json = update_coin_prices(json_data)
 #
-#    # Clear the JSON to make it ready for the next use
-#    with open('all_boards_data.json', 'w') as f:
-#        json.dump({"boards": []}, f, indent=2)  # Save an empty object
+#   # Clear the JSON to make it ready for the next use
+#   with open('all_boards_data.json', 'w') as f:
+#       json.dump({"boards": []}, f, indent=2)  # Save an empty object
 #
-#    print("The JSON has been cleared and is ready for the next use.")
-#    print(f"Number of calls made to Coingecko: {coingecko_calls}")  # Informative print
+#   print("The JSON has been cleared and is ready for the next use.")
 #
 #if __name__ == "__main__":
 #    main()
-#
