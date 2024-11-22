@@ -5,6 +5,18 @@ import requests
 import json
 from ast import literal_eval
 from monday.exceptions import MondayError
+from dotenv import load_dotenv
+load_dotenv()
+
+MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
+
+monday_client = MondayClient(MONDAY_API_KEY_NOVATIDE)
+monday_url = "https://api.monday.com/v2"
+
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": MONDAY_API_KEY_NOVATIDE
+}
 
 # Handle the SUM in the formula
 def SUM(*args):
