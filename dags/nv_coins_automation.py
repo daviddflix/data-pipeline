@@ -2,9 +2,6 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 import json
-from dotenv import load_dotenv
-load_dotenv() 
-import os
 from pytz import timezone
 
 # Import necessary functions from external scripts
@@ -13,8 +10,6 @@ from functions.nv_coins_automation.monday_client import update_coin_prices
 
 # Define the U.K. time zone
 uk_tz = timezone('Europe/London')
-
-MONDAY_API_KEY_NOVATIDE=os.getenv('MONDAY_API_KEY_NOVATIDE')
 
 # Define default arguments for the DAG
 default_args = {
