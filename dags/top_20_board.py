@@ -28,7 +28,7 @@ with DAG(
     'top_20_boards',  # Name of the DAG
     default_args=default_args,  # Use the default arguments defined above
     description='DAG for nv coins automation',  # Short description of the DAG
-    schedule_interval='0 * * *',  # Runs at 12:00 PM and 12:00 AM UTC (adjusted for UK time)
+    schedule_interval='0 10 * * *',  # Runs at 12:00 PM and 12:00 AM UTC (adjusted for UK time)
     start_date=datetime(2024, 11, 20, tzinfo=uk_tz),
     catchup=False  # No backfilling for missed tasks
 ) as dag:
