@@ -28,8 +28,8 @@ with DAG(
     'top_20_boards',  # Name of the DAG
     default_args=default_args,  # Use the default arguments defined above
     description='DAG for processing and updating top 20 performing coins',  # Short description of the DAG
-    schedule_interval='0 10 * * *',  # Runs at 10:00 AM UTC daily
-    start_date=datetime(2024, 11, 20, tzinfo=uk_tz),
+    schedule_interval='0 10 * * 5',  # Runs at 10:00 UK time every Friday
+    start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Start on the next Friday
     catchup=False  # No backfilling for missed tasks
 ) as dag:
 
