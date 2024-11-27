@@ -86,7 +86,11 @@ def get_board_items(board_ids, limit=500):
                    
                     coin_data['Average Buy Price'] = sum(non_zero_prices) / len(non_zero_prices) if non_zero_prices else 0
                     
-                    valuation_price = float(coin_data.get('Valuation Price', 0) or 0)
+                    valuation_price = coin_data.get('Valuation Price', '0')  # Cambiar a '0' si no existe
+                    try:
+                        valuation_price = float(valuation_price)  # Intentar convertir a float
+                    except ValueError:
+                        valuation_price = 0  # Si falla, asignar 0
                     
                     coin_data['% Price Change'] = ((valuation_price - coin_data['Average Buy Price']) / coin_data['Average Buy Price']) * 100 if coin_data['Average Buy Price'] != 0 else 0
                     
@@ -214,11 +218,12 @@ def create_group_and_add_items(board_id, group_name, items_data):
                 "texto1__1": item['Code'].upper(),
                 "texto2__1": item['group_name'],
                 "texto6__1": item['Category'],
-                "valuation_price__1": str(item['Valuation Price']),  # Round the current price
-                "texto__1": str(item['Total Quantity'] or 0),  # Round total_quantity
-                "texto4__1": str(item['Current Total Value']),  # Add the new calculated value
-                "texto3__1": str(item['P/L']),  # Add the P/L
-                "texto30__1": str(item['ROI']),
+                "valuation_price__1": f"{float(item['Valuation Price']):.12f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
+                "texto__1": f"{round(float(item['Total Quantity']), 2):.2f}",  # Redondear a 2 decimales
+                "texto8__1": f"{float(item['Average Buy Price']):.12f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
+                "texto4__1": f"${round(float(item['Current Total Value']), 2):.2f}",  # Redondear a 2 decimales
+                "texto3__1": f"${round(float(item['P/L']), 2):.2f}",  # Redondear P/L a 2 decimales
+                "texto30__1": f"{round(item['ROI'])}%",  # Redondear ROI a número entero
                 "texto307__1": datetime.datetime.now().strftime("%d/%m/%Y")
             }
                 
@@ -275,7 +280,7 @@ def update_monday_boards():
         # Actualizar el tablero de las peores monedas
         print("Updating Weekly Lowest TOP 20...")
         success_worst = create_group_and_add_items(
-            board_id=1716430755,
+            board_id=1721925921,
             group_name=current_week,
             items_data=worst_20_data
         )

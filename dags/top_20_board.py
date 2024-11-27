@@ -47,11 +47,10 @@ with DAG(
         - CEX_MASTER: 1652251054 (Centralized Exchange Master Board)
         - DEX_MASTER: 1678221568 (Decentralized Exchange Master Board)
         """
-        # Define board IDs for CEX and DEX master boards
         CEX_MASTER = 1652251054
         DEX_MASTER = 1678221568
-
-        # Step 1: Retrieve and process data from Monday.com
+    
+        # Retrieve and process data from Monday.com
         board_items = get_board_items(board_ids=[DEX_MASTER, CEX_MASTER])
         if board_items:
             save_board_items_to_json(board_items)
@@ -59,28 +58,26 @@ with DAG(
             print("Could not retrieve data from the board.")
             return
 
-        # Step 2: Load processed data for filtering
+        # Load data and process for filtering
         board_data = load_board_data()
-
-        # Step 3: Filter coins based on performance criteria
-        # Get best performing coins (ROI > 50%)
+    
+        # Filter for best and worst coins
         bestcoins = [
             coin for coin in board_data 
             if coin.get('ROI', 0) > 50 and coin.get('Valuation Price', None) is not None
         ]
 
-        # Get worst performing coins (ROI < -90%)
         worstcoins = [
-            coin for coin in board_data 
+        coin for coin in board_data 
             if coin.get('ROI', 0) < -90 and coin.get('Valuation Price', None) is not None
         ]
-
-        # Step 4: Save filtered results to JSON files
+        
+        # Save results to respective JSON files
         save_to_json(bestcoins, "best.json")
         save_to_json(worstcoins, "worst.json")
         print("Results saved in best.json and worst.json")
-
-        # Step 5: Update Monday.com boards with new data
+    
+        # Update Monday.com boards
         update_monday_boards()
     
     # Create the PythonOperator task for top 20 boards processing

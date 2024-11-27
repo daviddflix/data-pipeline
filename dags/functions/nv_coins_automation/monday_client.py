@@ -596,7 +596,7 @@ def write_new_update(item_id, value):
 # Get column IDs for one board - MONDAY LIBRARY
 def get_column_ids(board_id):
     try:
-        board_info = monday_client.boards.fetch_columns_by_board_id(board_ids=[board_id])
+        board_info = monday_client.boards.fetch_columns_by_board_id(board_ids=[1716371627])
         columns = board_info['data']['boards'][0]['columns']
         
         columns_data = []
@@ -623,15 +623,15 @@ def get_column_ids(board_id):
 # user_email = "s.tamulyte@novatidelabs.com"
 # print(get_user_id(user_email))
 
-# print(get_column_ids(board_id=1652251054))
+#print(get_column_ids(board_id=1678221568))
 # print(write_new_update(item_id=1355566235, value=f'new test'))
 # create_notification(user_id=53919924, item_id=1355566235, value="test")
 #print(change_column_value(board_id=1652251054, item_id=1652272796, column_id="valuation_price__1", value=0.407181))
 
 
-# print(get_board_items(board_ids=[1537800320]))
-# print(get_all_boards(search_param="KuCoin Wallet Master Sheet"))
-# print(get_board_item_general_test(board_ids=[1414986103]))
+#print(get_board_items(board_ids=[1652251054]))
+#print(get_all_boards(search_param="Low Top 20 "))
+#print(get_board_item_general_test(board_ids=[1652251054]))
 
 
 # --------- Coingecko ------------------------------
@@ -656,6 +656,21 @@ def get_coin_list(api_key):
         return {}
     
     
+# Cache para almacenar precios
+price_cache = {}
+cache_duration = 600  # Duración del caché en segundos (10 minutos)
+
+def get_cached_price(symbol):
+    current_time = time.time()
+    if symbol in price_cache:
+        price, timestamp = price_cache[symbol]
+        if current_time - timestamp < cache_duration:
+            return price
+    return None
+
+def cache_price(symbol, price):
+    price_cache[symbol] = (price, time.time())
+
 def get_coin_prices(api_key: str, coins: list) -> dict:
     coin_map = get_coin_list(api_key)
     symbol_to_id = {}
@@ -664,20 +679,57 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         symbol = coin['coin_symbol'].lower()
         name = coin['coin_name'].lower()
         
-        # New comparison method
+        # Normalizar el nombre y símbolo para mejorar la coincidencia
+        normalized_name = name.replace(" ", "").replace("-", "").strip()
+        normalized_symbol = symbol.replace(" ", "").replace("-", "").strip()
+        
+        # Manejo especial para Ethereum
+        if (normalized_name == "ethereum" and normalized_symbol == "eth"):
+            symbol_to_id[symbol] = "ethereum"  # Asignar directamente el ID de Ethereum
+            continue  # Saltar al siguiente coin
+
+        # Agregar apartado para Frax Share
+        if (normalized_name == "frax share" and normalized_symbol in ["fxs", "fxs"]):
+            symbol_to_id[symbol] = "frax-share"  # Asignar directamente el ID de Frax Share
+            continue  # Saltar al siguiente coin
+
+        # Agregar apartado especial para Lido DAO
+        if (normalized_name == "lido dao" and normalized_symbol == "ldo"):
+            symbol_to_id[symbol] = "lido-dao"  # Asignar directamente el ID de Lido DAO
+            continue  # Saltar al siguiente coin
+
+        # Agregar apartado especial para Smart Layer Network
+        if (normalized_name == "smart layer network" and normalized_symbol == "sln"):
+            symbol_to_id[symbol] = "smart-layer-network"  # Asignar directamente el ID de Smart Layer Network
+            continue  # Saltar al siguiente coin
+        
+        # Agregar apartado especial para Dogecoin
+        if (normalized_name == "dogecoin" and normalized_symbol == "doge"):
+            symbol_to_id[symbol] = "dogecoin"  # Asignar directamente el ID de Dogecoin
+            continue  # Saltar al siguiente coin
+
+        # Nueva lógica de comparación para otras monedas
         match_found = False
         for coingecko_id, coingecko_data in coin_map.items():
-            if name == coingecko_id.lower() or name == coingecko_data.lower():
-                symbol_to_id[symbol] = coingecko_id
-                match_found = True
-                break
+            # Verificar que coingecko_data sea un diccionario
+            if isinstance(coingecko_data, dict):
+                coingecko_normalized_name = coingecko_data['name'].lower().replace(" ", "").replace("-", "").strip()
+                coingecko_normalized_id = coingecko_data['id'].lower().replace(" ", "").replace("-", "").strip()
+                coingecko_normalized_symbol = coingecko_data['symbol'].lower().replace(" ", "").replace("-", "").strip()
+                
+                # Verificar coincidencias exactas
+                if normalized_name == coingecko_normalized_id and normalized_symbol == coingecko_normalized_symbol:
+                    symbol_to_id[symbol] = coingecko_id
+                    match_found = True
+                    break
+
         
-        # If no match found, fall back to the previous method
+        # Si no se encontró coincidencia, volver al método anterior
         if not match_found:
-            if symbol in coin_map:
-                symbol_to_id[symbol] = coin_map[symbol]
-            elif name in coin_map:
-                symbol_to_id[symbol] = coin_map[name]
+            if normalized_symbol in coin_map:
+                symbol_to_id[symbol] = coin_map[normalized_symbol]
+            elif normalized_name in coin_map:
+                symbol_to_id[symbol] = coin_map[normalized_name]
 
     url = "https://pro-api.coingecko.com/api/v3/simple/price"
     prices = {}
@@ -697,7 +749,13 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             data = response.json()
             for symbol, id in symbol_to_id.items():
                 if id in data:
-                    prices[symbol] = data[id]
+                    # Check cache first
+                    cached_price = get_cached_price(symbol)
+                    if cached_price is not None:
+                        prices[symbol] = cached_price
+                    else:
+                        prices[symbol] = data[id]
+                        cache_price(symbol, data[id])  # Cache the new price
             time.sleep(1)
         except requests.RequestException as e:
             print(f"Error al obtener datos: {e}")
@@ -716,16 +774,27 @@ def update_coin_prices(json_data):
         for coin in coins:
             symbol = coin['coin_symbol'].lower()
             if symbol in prices:
-                price = prices[symbol]
+                price_data = prices[symbol]  # Obtener el diccionario de precios
+                price = price_data.get('usd', 0)  # Acceder al valor en 'usd', o usar 0 si no existe
+                
+                # Aquí se aplica el nuevo código para formatear el valor de valuation_price
+                valuation_price = price if price else 0  # Cambiar a 0 si no existe
+                try:
+                    valuation_price = float(valuation_price)  # Intentar convertir a float
+                    # Formatear el precio de valoración para que tenga hasta 7 decimales solo si es necesario
+                    valuation_price = f"{valuation_price:.7f}".rstrip('0').rstrip('.')  # Limitar a 7 decimales y eliminar ceros innecesarios
+                except ValueError:
+                    valuation_price = "0.0000000"  # Si falla, asignar 0 con 7 decimales
+
                 # Si price es un número, usarlo directamente
-                coin['column_ids']['updated_price'] = price
+                coin['column_ids']['updated_price'] = valuation_price
                 
                 # Update the price in Monday.com using the board_id of the current board
                 result = change_column_value(
                     item_id=int(coin['coin_id']),
                     board_id=int(board_id),
                     column_id=coin['column_ids']['valuation_price_column_id'],
-                    value=price
+                    value=valuation_price  # Usar el valor formateado
                 )
                 
                 if result:
@@ -891,9 +960,10 @@ def get_formatted_board_items(search_param):
 
     return json.dumps(result, indent=2)
 
+
 # Ejemplo de uso
 #def main():
-#   search_param = "master sheet"
+#   search_param = "Master"
 #   formatted_json = get_formatted_board_items(search_param)
 #   print("The results have been saved in 'board_items.json'")
 #
