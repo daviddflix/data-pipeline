@@ -3,65 +3,71 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 from pytz import timezone
 
-# Import necessary functions from external scripts
+# Import necessary functions from external scripts for handling Monday.com board operations
 from functions.top_20_boards.top_20_boards import get_board_items
 from functions.top_20_boards.top_20_boards import save_board_items_to_json
 from functions.top_20_boards.top_20_boards import load_board_data
 from functions.top_20_boards.top_20_boards import save_to_json
 from functions.top_20_boards.top_20_boards import update_monday_boards
 
-# Define the U.K. time zone
+# Define the U.K. time zone for consistent scheduling
 uk_tz = timezone('Europe/London')
 
-# Define default arguments for the DAG
+# Define default arguments for the DAG with standard Airflow configurations
 default_args = {
-    'owner': 'airflow',  # Owner of the DAG
-    'depends_on_past': False,  # Task runs are independent of past runs
-    'email_on_failure': False,  # No emails on failure
-    'email_on_retry': False,  # No emails on retries
-    'retries': 1,  # Number of retry attempts if the task fails
-    'retry_delay': timedelta(minutes=5),  # Delay between retry attempts
+    'owner': 'airflow',  # Specifies who owns/maintains this DAG
+    'depends_on_past': False,  # Each run is independent of previous runs
+    'email_on_failure': False,  # Disables email notifications on task failure
+    'email_on_retry': False,  # Disables email notifications on task retry
+    'retries': 1,  # Attempts to retry failed task once
+    'retry_delay': timedelta(minutes=5),  # Waits 5 minutes before retry attempt
 }
 
 # Define the DAG for retrieving and processing top 20 coins data
 with DAG(
-    'top_20_boards',  # Name of the DAG
-    default_args=default_args,  # Use the default arguments defined above
-    description='DAG for processing and updating top 20 performing coins',  # Short description of the DAG
-    schedule_interval='0 10 * * 5',  # Runs at 10:00 UK time every Friday
-    start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Start on the next Friday
-    catchup=False  # No backfilling for missed tasks
+    'top_20_boards',  # Unique identifier for this DAG
+    default_args=default_args,  # Apply the default configurations
+    description='DAG for processing and updating top 20 performing coins',  
+    schedule_interval='0 10 * * 5',  # Executes at 10:00 AM UK time every Friday
+    start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Initial execution date
+    catchup=False  # Prevents backfilling of missed runs
 ) as dag:
 
     def top_20_boards_py():
         """
-        Main function to process and update top 20 performing coins boards.
+        Processes and updates Monday.com boards with top performing cryptocurrency data.
         
-        This function performs the following steps:
-        1. Retrieves data from specified Monday.com boards (CEX and DEX)
-        2. Processes and filters coins based on ROI performance
-        3. Saves filtered results to JSON files
-        4. Updates Monday.com boards with the processed data
+        This function orchestrates the entire workflow for tracking cryptocurrency performance:
+        1. Fetches current data from both CEX and DEX Monday.com master boards
+        2. Processes the retrieved data to identify top and bottom performers
+        3. Filters coins based on ROI thresholds:
+           - Best performers: ROI > 50%
+           - Worst performers: ROI < -90%
+        4. Saves the filtered results to JSON files for record keeping
+        5. Updates the corresponding Monday.com boards with new data
         
-        Board IDs:
-        - CEX_MASTER: 1652251054 (Centralized Exchange Master Board)
-        - DEX_MASTER: 1678221568 (Decentralized Exchange Master Board)
+        Board Information:
+        - CEX_MASTER (1652251054): Tracks coins from Centralized Exchanges
+        - DEX_MASTER (1678221568): Tracks coins from Decentralized Exchanges
+        
+        Note: Only processes coins that have a valid Valuation Price
         """
-        CEX_MASTER = 1652251054
-        DEX_MASTER = 1678221568
+        # Define board IDs for data retrieval
+        CEX_MASTER = 1652251054  # Centralized Exchange master board
+        DEX_MASTER = 1678221568  # Decentralized Exchange master board
     
-        # Retrieve and process data from Monday.com
+        # Fetch current data from Monday.com boards
         board_items = get_board_items(board_ids=[DEX_MASTER, CEX_MASTER])
         if board_items:
-            save_board_items_to_json(board_items)
+            save_board_items_to_json(board_items)  # Cache the retrieved data
         else:
             print("Could not retrieve data from the board.")
             return
 
-        # Load data and process for filtering
+        # Process the cached data for analysis
         board_data = load_board_data()
     
-        # Filter for best and worst coins
+        # Filter coins based on performance criteria
         bestcoins = [
             coin for coin in board_data 
             if coin.get('ROI', 0) > 50 and coin.get('Valuation Price', None) is not None
@@ -72,20 +78,20 @@ with DAG(
             if coin.get('ROI', 0) < -90 and coin.get('Valuation Price', None) is not None
         ]
         
-        # Save results to respective JSON files
+        # Save filtered results for record keeping
         save_to_json(bestcoins, "best.json")
         save_to_json(worstcoins, "worst.json")
         print("Results saved in best.json and worst.json")
     
-        # Update Monday.com boards
+        # Update Monday.com boards with processed data
         update_monday_boards()
     
-    # Create the PythonOperator task for top 20 boards processing
+    # Create the task that will execute our processing function
     top_20_boards = PythonOperator(
-        task_id='top_20_boards',  # Task identifier
-        python_callable=top_20_boards_py,  # Function to execute for this task
-        dag=dag  # Link task to the DAG
+        task_id='top_20_boards',  # Unique identifier for this task
+        python_callable=top_20_boards_py,  # Points to our processing function
+        dag=dag  # Associates this task with our DAG
     )
 
-    # Set task dependencies (single task, no dependencies needed)
+    # Define task flow (single task, so no dependencies needed)
     top_20_boards
