@@ -53,37 +53,37 @@ with DAG(
         Note: Only processes coins that have a valid Valuation Price
         """
         # Define board IDs for data retrieval
-        CEX_MASTER = 1652251054  # Centralized Exchange master board
-        DEX_MASTER = 1678221568  # Decentralized Exchange master board
-    
-        # Fetch current data from Monday.com boards
+        CEX_MASTER = 1652251054
+        DEX_MASTER = 1678221568
+        
+        # Retrieve and process data from Monday.com
         board_items = get_board_items(board_ids=[DEX_MASTER, CEX_MASTER])
         if board_items:
-            save_board_items_to_json(board_items)  # Cache the retrieved data
+            save_board_items_to_json(board_items)
         else:
             print("Could not retrieve data from the board.")
             return
-
-        # Process the cached data for analysis
-        board_data = load_board_data()
     
-        # Filter coins based on performance criteria
+        # Load data and process for filtering
+        board_data = load_board_data()
+        
+        # Filter for best and worst coins
         bestcoins = [
             coin for coin in board_data 
             if coin.get('ROI', 0) > 50 and coin.get('Valuation Price', None) is not None
         ]
-
+    
         worstcoins = [
-        coin for coin in board_data 
+            coin for coin in board_data 
             if coin.get('ROI', 0) < -90 and coin.get('Valuation Price', None) is not None
         ]
-        
-        # Save filtered results for record keeping
+            
+        # Save results to respective JSON files
         save_to_json(bestcoins, "best.json")
         save_to_json(worstcoins, "worst.json")
         print("Results saved in best.json and worst.json")
-    
-        # Update Monday.com boards with processed data
+        
+        # Update Monday.com boards
         update_monday_boards()
     
     # Create the task that will execute our processing function

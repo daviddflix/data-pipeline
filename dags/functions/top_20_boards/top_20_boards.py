@@ -102,7 +102,8 @@ def get_board_items(board_ids, limit=500):
                     ]
 
                     coin_data['Total Quantity'] = sum(quantities)
-                   
+                    
+                    
                     total_quantities = [
                         float(coin_data.get(f'{i}{suffixes[i-1]} Quantity', 0) or 0) *
                         float(coin_data.get(f'Buy Price {i}', 0) or 0)
@@ -218,9 +219,9 @@ def create_group_and_add_items(board_id, group_name, items_data):
                 "texto1__1": item['Code'].upper(),
                 "texto2__1": item['group_name'],
                 "texto6__1": item['Category'],
-                "valuation_price__1": f"{float(item['Valuation Price']):.12f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
-                "texto__1": f"{round(float(item['Total Quantity']), 2):.2f}",  # Redondear a 2 decimales
-                "texto8__1": f"{float(item['Average Buy Price']):.12f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
+                "valuation_price__1": f"${float(item['Valuation Price']):.12f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
+                "texto__1": f"${round(float(item['Total Cost']), 2):.2f}",  # Redondear a 2 decimales
+                "texto8__1": f"${float(item['Average Buy Price']):.7f}".rstrip('0').rstrip('.'),  # Limitar a 7 decimales y eliminar ceros a la derecha
                 "texto4__1": f"${round(float(item['Current Total Value']), 2):.2f}",  # Redondear a 2 decimales
                 "texto3__1": f"${round(float(item['P/L']), 2):.2f}",  # Redondear P/L a 2 decimales
                 "texto30__1": f"{round(item['ROI'])}%",  # Redondear ROI a número entero
