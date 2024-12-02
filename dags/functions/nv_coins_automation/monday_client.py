@@ -689,7 +689,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
 
         # Agregar apartado para Frax Share
-        if (normalized_name == "frax share" and normalized_symbol in ["fxs", "fxs"]):
+        if (normalized_name == "frax share" and normalized_symbol == "fxs"):
             symbol_to_id[symbol] = "frax-share"  # Asignar directamente el ID de Frax Share
             continue  # Saltar al siguiente coin
 
@@ -707,7 +707,83 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         if (normalized_name == "dogecoin" and normalized_symbol == "doge"):
             symbol_to_id[symbol] = "dogecoin"  # Asignar directamente el ID de Dogecoin
             continue  # Saltar al siguiente coin
-
+        
+        if (normalized_name == "bittensor" or normalized_symbol == "tao"):
+            symbol_to_id[symbol] = "bittensor"  # Asignar directamente el ID de Bittensor
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "lido dao" and normalized_symbol == "ldo"):
+            symbol_to_id[symbol] = "lido-dao"  # Asignar directamente el ID de Lido DAO
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "pyth network" and normalized_symbol == "pyth"):
+            symbol_to_id[symbol] = "pyth-network"  # Asignar directamente el ID de Pyth Network
+            continue  # Saltar al siguiente coin
+            
+        if (normalized_name == "illuvium" and normalized_symbol == "ilv"):
+            symbol_to_id[symbol] = "illuvium"  # Asignar directamente el ID de Illuvium
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "skale" and normalized_symbol == "skl"):
+            symbol_to_id[symbol] = "skale"  # Asignar directamente el ID de SKALE
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "kamino" and normalized_symbol == "kmno"):
+            symbol_to_id[symbol] = "kamino"  # Asignar directamente el ID de Kamino
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "chainlink" and normalized_symbol == "link"):
+            symbol_to_id[symbol] = "chainlink"  # Asignar directamente el ID de Chainlink
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "blur" and normalized_symbol == "blur"):
+            symbol_to_id[symbol] = "blur"  # Asignar directamente el ID de Blur
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "cosmos hub" and normalized_symbol == "atom"):
+            symbol_to_id[symbol] = "cosmos"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "optimism" and normalized_symbol == "op"):
+            symbol_to_id[symbol] = "optimism"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "the graph" and normalized_symbol == "grt"):
+            symbol_to_id[symbol] = "the-graph"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "gmx" and normalized_symbol == "gmx"):
+            symbol_to_id[symbol] = "gmx"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "grass" and normalized_symbol == "grass"):
+            symbol_to_id[symbol] = "grass"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "xai" and normalized_symbol == "xai"):
+            symbol_to_id[symbol] = "xai"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "dojo token" and normalized_symbol == "dojo"):
+            symbol_to_id[symbol] = "dojo-token"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "sei" and normalized_symbol == "sei"):
+            symbol_to_id[symbol] = "sei"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "hedera" and normalized_symbol == "hbar"):
+            symbol_to_id[symbol] = "hedera-hashgraph"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "casper network" and normalized_symbol == "cspr"):
+            symbol_to_id[symbol] = "casper-network"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "soil" and normalized_symbol == "soil"):
+            symbol_to_id[symbol] = "soil"
+            continue  # Saltar al siguiente coin
+        
         # Nueva lógica de comparación para otras monedas
         match_found = False
         for coingecko_id, coingecko_data in coin_map.items():
