@@ -1036,7 +1036,6 @@ def get_formatted_board_items(search_param):
 
     return json.dumps(result, indent=2)
 
-
 # Ejemplo de uso
 #def main():
 #   search_param = "Master"
