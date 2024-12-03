@@ -23,13 +23,12 @@ default_args = {
     'retry_delay': timedelta(minutes=5),  # Waits 5 minutes before retry attempt
 }
 
-# Define the DAG for retrieving and processing top 20 coins data
 with DAG(
     'top_20_boards',  # Unique identifier for this DAG
-    default_args=default_args,  # Apply the default configurations
+    default_args=default_args,
     description='DAG for processing and updating top 20 performing coins',  
-    schedule_interval='0 10 * * 5',  # Executes at 10:00 AM UK time every Friday
-    start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Initial execution date
+    schedule_interval='0 7 * * 5',  # Executes at 7:00 AM UTC (10:00 AM Argentina time) every Friday
+    start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Initial execution date in UK time
     catchup=False  # Prevents backfilling of missed runs
 ) as dag:
 
