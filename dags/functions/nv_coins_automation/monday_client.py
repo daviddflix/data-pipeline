@@ -694,7 +694,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
 
         # Agregar apartado especial para Lido DAO
-        if (normalized_name == "lido dao" and normalized_symbol == "ldo"):
+        if (normalized_name == "Lido dao" or normalized_name == "lido dao" and normalized_symbol == "ldo"):
             symbol_to_id[symbol] = "lido-dao"  # Asignar directamente el ID de Lido DAO
             continue  # Saltar al siguiente coin
 
@@ -724,7 +724,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "illuvium"  # Asignar directamente el ID de Illuvium
             continue  # Saltar al siguiente coin
         
-        if (normalized_name == "skale" and normalized_symbol == "skl"):
+        if (normalized_name == "skale" or normalized_name == 'SKALE' and normalized_symbol == "skl"):
             symbol_to_id[symbol] = "skale"  # Asignar directamente el ID de SKALE
             continue  # Saltar al siguiente coin
         
@@ -740,7 +740,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "blur"  # Asignar directamente el ID de Blur
             continue  # Saltar al siguiente coin
         
-        if (normalized_name == "cosmos hub" and normalized_symbol == "atom"):
+        if (normalized_name == "cosmos hub" or normalized_name == "Cosmos Hub" or normalized_name == "Cosmos" or normalized_name == "Cosmos-hub" or normalized_name == "Cosmos-Hub" and normalized_symbol == "atom"):
             symbol_to_id[symbol] = "cosmos"
             continue  # Saltar al siguiente coin
         
@@ -748,7 +748,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "optimism"
             continue  # Saltar al siguiente coin
         
-        if (normalized_name == "the graph" and normalized_symbol == "grt"):
+        if (normalized_name == "the graph" or normalized_name == 'The Graph' and normalized_symbol == "grt"):
             symbol_to_id[symbol] = "the-graph"
             continue  # Saltar al siguiente coin
         
@@ -782,6 +782,14 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         
         if (normalized_name == "soil" and normalized_symbol == "soil"):
             symbol_to_id[symbol] = "soil"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "realio" and normalized_symbol == "rio"):
+            symbol_to_id[symbol] = "realio-network"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "morpho" and normalized_symbol == "morpho"):
+            symbol_to_id[symbol] = "morpho"
             continue  # Saltar al siguiente coin
         
         # Nueva lógica de comparación para otras monedas
@@ -1035,6 +1043,7 @@ def get_formatted_board_items(search_param):
         print(f"Error saving the JSON file: {str(e)}")
 
     return json.dumps(result, indent=2)
+
 
 # Ejemplo de uso
 #def main():

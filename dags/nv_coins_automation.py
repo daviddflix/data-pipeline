@@ -59,8 +59,8 @@ with DAG(
             json.dump({"boards": []}, f, indent=2)  # Save an empty object
 
         print("The JSON has been cleared and is ready for the next use.")
-    
-    # Create the task that will execute our coin price update function
+        
+     # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(
         task_id='nv_coins_automation',  # Unique identifier for this task
         python_callable=nv_coins_automation_py,  # Points to our processing function
