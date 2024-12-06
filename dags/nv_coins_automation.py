@@ -2,11 +2,15 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 import json
+import time 
 from pytz import timezone
 
 # Import necessary functions from external scripts for handling Monday.com board operations
 from functions.nv_coins_automation.monday_client import get_formatted_board_items
 from functions.nv_coins_automation.monday_client import update_coin_prices
+from functions.nv_coins_automation.monday_client import get_specific_wallets_data
+from functions.nv_coins_automation.monday_client import get_coin_prices
+from functions.nv_coins_automation.monday_client import change_column_value
 
 # Define the U.K. time zone for consistent scheduling
 uk_tz = timezone('Europe/London')
@@ -26,39 +30,83 @@ with DAG(
     'nv_coins_automation',  # Unique identifier for this DAG
     default_args=default_args,  # Apply the default configurations
     description='DAG for automating coin price updates in Monday.com boards',  
-    schedule_interval='0 12,0 * * *',  # Executes at 12:00 PM and 12:00 AM UTC daily
+    schedule_interval="0 11 * * *",  # Executes at 11:00 AM
     start_date=datetime(2024, 11, 20, tzinfo=uk_tz),  # Initial execution date
     catchup=False  # Prevents backfilling of missed runs
 ) as dag:
 
-    def nv_coins_automation_py():
+    def nv_coins_automation_py():   
         """
-        Automates the process of updating coin prices in Monday.com boards.
-        
-        This function performs the following operations:
-        1. Retrieves board items from Monday.com boards containing "Master" in their names
-        2. Saves the retrieved data to a JSON file for processing
-        3. Updates coin prices using external price sources
-        4. Updates the Monday.com boards with new price data
-        5. Clears the temporary JSON storage for the next run
-        
-        The function runs twice daily to ensure price data stays current across all boards.
+        Main execution flow for updating cryptocurrency prices and wallet data.
         """
-        search_param = "Master"
-        formatted_json = get_formatted_board_items(search_param)
-        print("The results have been saved in 'board_items.json'")
+        try:
+            print("\n=== Starting Price Update Process ===")
 
-        with open('all_boards_data.json', 'r') as f:
-            json_data = json.load(f)
+            # 1. Get Master Board data
+            print("\n1. Getting Master Board data...")
+            search_param = "Master"
+            formatted_json = get_formatted_board_items(search_param)
+            print("��� Master Board data saved to 'board_items.json'")
 
-        # Update prices and Monday.com
-        updated_json = update_coin_prices(json_data)
+            # 2. Load and update prices
+            print("\n2. Updating prices for Master Board...")
+            with open('all_boards_data.json', 'r') as f:
+                master_board_data = json.load(f)
+            updated_master = update_coin_prices(master_board_data)
+            print("✓ Master Board prices updated")
 
-        # Clear the JSON to make it ready for the next use
-        with open('all_boards_data.json', 'w') as f:
-            json.dump({"boards": []}, f, indent=2)  # Save an empty object
+            #1. Get wallet data
+            print("\n1. Getting wallet data...")
+            wallets_data = get_specific_wallets_data()
+            if not wallets_data['success']:
+                raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
+            print("✓ Wallet data retrieved")
 
-        print("The JSON has been cleared and is ready for the next use.")
+            # 2. Update prices directly using change_column_value
+            print("\n2. Updating prices in Monday.com...")
+            board_id = 1652251054  # CEX MASTER BOARD ID
+
+            for group_name, items in wallets_data['data'].items():
+                print(f"\nProcessing group: {group_name}")
+                for item in items:
+                    try:
+                        item_id = item['id']
+                        code = item['columns']['Code']['value']
+                        valuation_column_id = item['columns']['Valuation Price']['id']
+
+                        if code:
+                            prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [{"coin_symbol": code, "coin_name": item['name']}])
+                            price = prices.get(code.lower(), {}).get('usd', 0)
+                            result = change_column_value(
+                                item_id=int(item_id),
+                                board_id=board_id,
+                                column_id=valuation_column_id,
+                                value=str(price)
+                            )
+                            print(f"{'✓' if result else '⚠️'} {code}: {item['name']}")
+
+                        time.sleep(0.5)  # Evitar límites de rate
+
+                    except Exception as e:
+                        print(f"⚠️ Error updating {item['name']}: {str(e)}")
+                        continue
+
+            # 4. Clean up
+            print("\n4. Cleaning up...")
+            # Clean all_boards_data.json
+            with open('all_boards_data.json', 'w') as f:
+                json.dump({"boards": []}, f, indent=2)
+            # Clean all_items_minimal.json
+            with open('all_items_minimal.json', 'w') as f:
+                json.dump({"success": True, "data": {}, "error": None}, f, indent=2)
+            print("✓ Temporary files cleaned")
+
+            print("\n=== Process Completed Successfully ===")
+
+        except Exception as e:
+            print(f"\n⚠️ Error in main process: {str(e)}")
+            print("Process terminated with errors")
+
         
      # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(

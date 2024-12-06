@@ -27,7 +27,7 @@ with DAG(
     'top_20_boards',  # Unique identifier for this DAG
     default_args=default_args,
     description='DAG for processing and updating top 20 performing coins',  
-    schedule_interval='0 7 * * *',  # Executes at 7:00 AM UTC (10:00 AM Argentina time) every Friday
+    schedule_interval="0 15 * * *",  # Executes at 15:00 (12:00 PM Argentina time)
     start_date=datetime(2024, 11, 29, tzinfo=uk_tz),  # Initial execution date in UK time
     catchup=False  # Prevents backfilling of missed runs
 ) as dag:

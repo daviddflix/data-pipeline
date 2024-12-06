@@ -694,7 +694,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
 
         # Agregar apartado especial para Lido DAO
-        if (normalized_name == "Lido dao" or normalized_name == "lido dao" and normalized_symbol == "ldo"):
+        if (normalized_name == "Lido" or normalized_name == "lido" or normalized_name == "Lido dao" or normalized_name == "lido dao" and normalized_symbol == "ldo"):
             symbol_to_id[symbol] = "lido-dao"  # Asignar directamente el ID de Lido DAO
             continue  # Saltar al siguiente coin
 
@@ -769,11 +769,15 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
         
         if (normalized_name == "sei" and normalized_symbol == "sei"):
-            symbol_to_id[symbol] = "sei"
+            symbol_to_id[symbol] = "sei-network"
             continue  # Saltar al siguiente coin
         
         if (normalized_name == "hedera" and normalized_symbol == "hbar"):
             symbol_to_id[symbol] = "hedera-hashgraph"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "CovalentX" or normalized_name == "covalentx" and normalized_symbol == "cqt"):
+            symbol_to_id[symbol] = "covalent-x-token"
             continue  # Saltar al siguiente coin
         
         if (normalized_name == "casper network" and normalized_symbol == "cspr"):
@@ -1044,23 +1048,299 @@ def get_formatted_board_items(search_param):
 
     return json.dumps(result, indent=2)
 
+
+
+def get_specific_wallets_data():
+    """
+    Get detailed information from specific wallet groups in CEX Master Board.
+    """
+    print("Starting function...")
+    result = {'success': False, 'data': {}, 'error': None}
+    board_name = "cex master board"
+    target_groups = [
+        {"title": "Rajan's Tangem Wallet #2 (from NV OKX)", "id": "new_group26777__1"},
+        {"title": "Aman's Tangem Wallet #1 (from OKX Sepia)", "id": "new_group81323__1"},
+        {"title": "CLOSED - OKX Sepia Wallet", "id": "group_title"},
+        {"title": "CLOSED - OKX Sepia International Wallet", "id": "new_group5225__1"}
+    ]
+    
+    try:
+        # Step 1: Get board ID and groups (esto ya funciona, lo dejamos igual)
+        print("Step 1: Getting board info...")
+        initial_query = '''
+        query {
+            boards(limit: 100) {
+                id
+                name
+                groups {
+                    id
+                    title
+                }
+            }
+        }
+        '''
+        
+        response = requests.post(monday_url, headers=headers, json={'query': initial_query})
+        response.raise_for_status()
+        data = response.json()
+        
+        boards = data['data']['boards']
+        target_board = next((board for board in boards if board['name'].lower() == board_name.lower()), None)
+        
+        if not target_board:
+            print(f"Board '{board_name}' not found")
+            result['error'] = f"Board '{board_name}' not found"
+            return result
+            
+        print(f"Found board: {target_board['name']} (ID: {target_board['id']})")
+        
+        # Step 2: Get items
+        print("\nStep 2: Getting items...")
+        items_query = '''
+        query {
+            boards(ids: [1652251054]) {
+                name
+                columns {
+                    id
+                    title
+                }
+                items_page(limit: 100) {
+                    cursor
+                    items {
+                        id
+                        name
+                        group {
+                            id
+                            title
+                        }
+                        column_values {
+                            id
+                            text
+                        }
+                    }
+                }
+            }
+        }
+        '''
+        
+        print("Executing items query...")
+        all_items = []
+        cursor = None
+        
+        # Get first response to create columns dictionary
+        response = requests.post(monday_url, headers=headers, json={'query': items_query})
+        print(f"Initial response status: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"Response content: {response.text}")
+            response.raise_for_status()
+            
+        items_data = response.json()
+        if 'errors' in items_data:
+            print(f"GraphQL errors: {items_data['errors']}")
+            result['error'] = items_data['errors']
+            return result
+        
+        # Create columns dictionary from first response
+        columns_dict = {
+            col['id']: col['title'] 
+            for col in items_data['data']['boards'][0]['columns']
+        }
+        print(f"Found {len(columns_dict)} columns")
+        
+        # Process first page of items
+        page_items = items_data['data']['boards'][0]['items_page']['items']
+        all_items.extend(page_items)
+        
+        # Get cursor for next page
+        cursor = items_data['data']['boards'][0]['items_page'].get('cursor')
+        
+        # Get remaining pages
+        while cursor:
+            current_query = items_query.replace('items_page(limit: 100)', f'items_page(limit: 100, cursor: "{cursor}")')
+            
+            response = requests.post(monday_url, headers=headers, json={'query': current_query})
+            print(f"Response status: {response.status_code}")
+            
+            if response.status_code != 200:
+                print(f"Response content: {response.text}")
+                response.raise_for_status()
+                
+            items_data = response.json()
+            if 'errors' in items_data:
+                print(f"GraphQL errors: {items_data['errors']}")
+                result['error'] = items_data['errors']
+                return result
+                
+            page_items = items_data['data']['boards'][0]['items_page']['items']
+            all_items.extend(page_items)
+            
+            # Get cursor for next page
+            cursor = items_data['data']['boards'][0]['items_page'].get('cursor')
+                
+        print(f"Found {len(all_items)} total items")
+        
+        # Imprimir todos los grupos que tienen items
+        print("\nGroups with items:")
+        groups_with_items = {}
+        for item in all_items:
+            group_id = item['group']['id']
+            group_title = item['group']['title']
+            if group_id not in groups_with_items:
+                groups_with_items[group_id] = {'title': group_title, 'count': 0}
+            groups_with_items[group_id]['count'] += 1
+            
+        for group_id, info in groups_with_items.items():
+            print(f"Group ID: {group_id} - Title: {info['title']} - Items: {info['count']}")
+        
+        # Process items for each target group
+        filtered_result = {'success': True, 'data': {}, 'error': None}
+        
+        for group in target_groups:
+            print(f"\nProcessing group: {group['title']} (ID: {group['id']})")
+            group_items = [
+                item for item in all_items
+                if item['group']['id'] == group['id']
+            ]
+            
+            print(f"Found {len(group_items)} items in group")
+            processed_items = []
+            
+            for item in group_items:
+                # Obtenemos los valores de las columnas que necesitamos
+                valuation_price = next(
+                    (col for col in item['column_values'] 
+                     if columns_dict[col['id']] == 'Valuation Price'), 
+                    {'id': '', 'text': ''}
+                )
+                
+                # Procesamos cada item con solo los campos necesarios
+                processed_item = {
+                    'id': item['id'],
+                    'name': item['name'],
+                    'columns': {
+                        'Subitems': next(
+                            (
+                                {'id': col['id'], 'value': col.get('text')}
+                                for col in item['column_values']
+                                if columns_dict[col['id']] == 'Subitems'
+                            ),
+                            {'id': '', 'value': None}
+                        ),
+                        'Code': next(
+                            (
+                                {'id': col['id'], 'value': col.get('text')}
+                                for col in item['column_values']
+                                if columns_dict[col['id']] == 'Code'
+                            ),
+                            {'id': '', 'value': ''}
+                        ),
+                        'Valuation Price': {
+                            'id': valuation_price['id'],
+                            'value': valuation_price.get('text', '')
+                        }
+                    }
+                }
+                processed_items.append(processed_item)
+            
+            if processed_items:
+                filtered_result['data'][group['title']] = processed_items
+                print(f"Processed {len(processed_items)} items in {group['title']}")
+        
+        # Save results to JSON file
+        json_filename = 'all_items_minimal.json'
+        try:
+            with open(json_filename, 'w', encoding='utf-8') as f:
+                json.dump(filtered_result, f, ensure_ascii=False, indent=2)
+            print(f"\nResults saved to {json_filename}")
+        except Exception as e:
+            print(f"\nError saving results to JSON: {str(e)}")
+        
+        return filtered_result
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Request error occurred: {str(e)}")
+        result['error'] = f"Request error: {str(e)}"
+    except Exception as e:
+        print(f"Unexpected error occurred: {str(e)}")
+        result['error'] = f"Unexpected error: {str(e)}"
+        
+    print("Function completed")
+    return result
+
+
 # Ejemplo de uso
 #def main():
-#   search_param = "Master"
-#   formatted_json = get_formatted_board_items(search_param)
-#   print("The results have been saved in 'board_items.json'")
+#    """
+#    Main execution flow for updating cryptocurrency prices and wallet data.
+#    """
+#    try:
+#        print("\n=== Starting Price Update Process ===")
+#        
+#        # 1. Get Master Board data
+#        print("\n1. Getting Master Board data...")
+#        search_param = "Master"
+#        formatted_json = get_formatted_board_items(search_param)
+#        print("��� Master Board data saved to 'board_items.json'")
 #
-#   with open('all_boards_data.json', 'r') as f:
-#       json_data = json.load(f)
+#        # 2. Load and update prices
+#        print("\n2. Updating prices for Master Board...")
+#        with open('all_boards_data.json', 'r') as f:
+#            master_board_data = json.load(f)
+#        updated_master = update_coin_prices(master_board_data)
+#        print("✓ Master Board prices updated")
 #
-#   # Update prices and Monday.com
-#   updated_json = update_coin_prices(json_data)
+#        #1. Get wallet data
+#        print("\n1. Getting wallet data...")
+#        wallets_data = get_specific_wallets_data()
+#        if not wallets_data['success']:
+#            raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
+#        print("✓ Wallet data retrieved")
 #
-#   # Clear the JSON to make it ready for the next use
-#   with open('all_boards_data.json', 'w') as f:
-#       json.dump({"boards": []}, f, indent=2)  # Save an empty object
+#        # 2. Update prices directly using change_column_value
+#        print("\n2. Updating prices in Monday.com...")
+#        board_id = 1652251054  # CEX MASTER BOARD ID
+#        
+#        for group_name, items in wallets_data['data'].items():
+#            print(f"\nProcessing group: {group_name}")
+#            for item in items:
+#                try:
+#                    item_id = item['id']
+#                    code = item['columns']['Code']['value']
+#                    valuation_column_id = item['columns']['Valuation Price']['id']
+#                    
+#                    if code:
+#                        prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [{"coin_symbol": code, "coin_name": item['name']}])
+#                        price = prices.get(code.lower(), {}).get('usd', 0)
+#                        result = change_column_value(
+#                            item_id=int(item_id),
+#                            board_id=board_id,
+#                            column_id=valuation_column_id,
+#                            value=str(price)
+#                        )
+#                        print(f"{'✓' if result else '⚠️'} {code}: {item['name']}")
+#                    
+#                    time.sleep(0.5)  # Evitar límites de rate
+#                    
+#                except Exception as e:
+#                    print(f"⚠️ Error updating {item['name']}: {str(e)}")
+#                    continue
 #
-#   print("The JSON has been cleared and is ready for the next use.")
+#        # 4. Clean up
+#        print("\n4. Cleaning up...")
+#        # Clean all_boards_data.json
+#        with open('all_boards_data.json', 'w') as f:
+#            json.dump({"boards": []}, f, indent=2)
+#        # Clean all_items_minimal.json
+#        with open('all_items_minimal.json', 'w') as f:
+#            json.dump({"success": True, "data": {}, "error": None}, f, indent=2)
+#        print("✓ Temporary files cleaned")
+#
+#        print("\n=== Process Completed Successfully ===")
+#        
+#    except Exception as e:
+#        print(f"\n⚠️ Error in main process: {str(e)}")
+#        print("Process terminated with errors")
 #
 #if __name__ == "__main__":
 #    main()
