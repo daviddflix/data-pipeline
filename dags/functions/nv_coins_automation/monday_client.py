@@ -689,8 +689,8 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
 
         # Agregar apartado para Frax Share
-        if (normalized_name == "frax share" and normalized_symbol == "fxs"):
-            symbol_to_id[symbol] = "frax-share"  # Asignar directamente el ID de Frax Share
+        if (normalized_name == "fraxshare" or normalized_name == "frax share" and normalized_symbol == "fxs"):
+            symbol_to_id[symbol] = "frax-share"  # ID en CoinGecko
             continue  # Saltar al siguiente coin
 
         # Agregar apartado especial para Lido DAO
@@ -699,7 +699,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue  # Saltar al siguiente coin
 
         # Agregar apartado especial para Smart Layer Network
-        if (normalized_name == "smart layer network" and normalized_symbol == "sln"):
+        if (normalized_name == "smartlayernetwork" or normalized_name == "smart layer network" and normalized_symbol == "sln"):
             symbol_to_id[symbol] = "smart-layer-network"  # Asignar directamente el ID de Smart Layer Network
             continue  # Saltar al siguiente coin
         
@@ -795,8 +795,195 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         if (normalized_name == "morpho" and normalized_symbol == "morpho"):
             symbol_to_id[symbol] = "morpho"
             continue  # Saltar al siguiente coin
+            
+        if (normalized_name == "moby" and normalized_symbol == "moby"):
+            symbol_to_id[symbol] = "moby"
+            continue  # Saltar al siguiente coin
         
-        # Nueva lógica de comparación para otras monedas
+        if (normalized_name == "Fact0rn" or normalized_name == "fact0rn" and normalized_symbol == "FACT" or normalized_symbol == "fact"):
+            symbol_to_id[symbol] = "fact0rn"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "layerai" or normalized_name == "layer ai" or normalized_name == "layerAi" and normalized_symbol == "lai"):
+            symbol_to_id[symbol] = "cryptogpt-token"
+            continue  # Saltar al siguiente coin
+        if (normalized_name == "banana gun" or normalized_name == "bananagun" and normalized_symbol == "BANANA" or normalized_symbol == "banana"):
+            symbol_to_id[symbol] = "banana-gun"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "aerodrome finance" or normalized_name == "aerodromefinance" or normalized_name == "aerodrome" or "aerodrome" in normalized_name and normalized_symbol == "aero" or normalized_symbol == "AERO"):
+            symbol_to_id[symbol] = "aerodrome-finance"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "spacemesh" or normalized_name == "Spacemesh" and normalized_symbol == "SMH"):
+            symbol_to_id[symbol] = "spacemesh"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "brett" and normalized_symbol == "brett"):
+            symbol_to_id[symbol] = "brett"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "gearbox" and normalized_symbol == "gear"):
+            symbol_to_id[symbol] = "gearbox"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "bob-token" or normalized_name == "bob" or "bob" in normalized_name or normalized_name == "bob token" or normalized_name == "BOB token" and normalized_symbol == "bob"):
+            symbol_to_id[symbol] = "bob-token"
+            continue  # Saltar al siguiente coin
+            
+        if (normalized_name == "bonk" and normalized_symbol == "bonk"):
+            symbol_to_id[symbol] = "bonk"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "decred" and normalized_symbol == "dcr"):
+            symbol_to_id[symbol] = "decred"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "degen base" and normalized_symbol == "degen"):
+            symbol_to_id[symbol] = "degen-base"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "inspect" and normalized_symbol == "insp"):
+            symbol_to_id[symbol] = "inspect"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "quant" and normalized_symbol == "qnt"):
+            symbol_to_id[symbol] = "quant-network"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "harmony" and normalized_symbol == "one"):
+            symbol_to_id[symbol] = "harmony"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "cardano" and normalized_symbol == "ada"):
+            symbol_to_id[symbol] = "cardano"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "core" and normalized_symbol == "core"):
+            symbol_to_id[symbol] = "coredaoorg"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "pepe" and normalized_symbol == "pepe"):
+            symbol_to_id[symbol] = "pepe"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "ape" or normalized_name == "apecoin" or normalized_name == "ape coin" and normalized_symbol == "ape"):
+            symbol_to_id[symbol] = "ape"
+            continue  # Saltar al siguiente coin
+        
+        if (normalized_name == "notcoin" and normalized_symbol == "not"):
+            symbol_to_id[symbol] = "notcoin"
+            continue
+
+        if (normalized_name == "masknetwork"  or normalized_name == "mask network" or normalized_name == "Mask Network" and normalized_symbol == "mask"):
+            symbol_to_id[symbol] = "mask-network"
+            continue
+
+        if (normalized_name == "flow" and normalized_symbol == "flow"):
+            symbol_to_id[symbol] = "flow"
+            continue
+
+        if (normalized_name == "measurabledata" or normalized_name == "measurable data" or normalized_name == "measurable data token" and normalized_symbol == "mdt"):
+            symbol_to_id[symbol] = "measurable-data-token"
+            continue
+
+        if (normalized_name == "dogwifhat" or normalized_name == "dog wif hat" or normalized_name == "dog wif hat" and normalized_symbol == "wif"):
+            symbol_to_id[symbol] = "dogwifcoin"
+            continue
+
+        if (normalized_name == "celestia" and normalized_symbol == "tia"):
+            symbol_to_id[symbol] = "celestia"
+            continue
+
+        if (normalized_name == "xrp" and normalized_symbol == "xrp"):
+            symbol_to_id[symbol] = "ripple"
+            continue
+
+        if (normalized_name == "stacks" and normalized_symbol == "stx"):
+            symbol_to_id[symbol] = "blockstack"
+            continue
+
+        if (normalized_name == "treasure" and normalized_symbol == "magic"):
+            symbol_to_id[symbol] = "magic"
+            continue
+
+        if (normalized_name == "toncoin" and normalized_symbol == "ton"):
+            symbol_to_id[symbol] = "toncoin"
+            continue
+
+        if (normalized_name == "memecoin" and normalized_symbol == "meme"):
+            symbol_to_id[symbol] = "memecoin-2"
+            continue
+
+        if (normalized_name == "tensor" and normalized_symbol == "tnsr"):
+            symbol_to_id[symbol] = "tensor"
+            continue
+
+        if (normalized_name == "aethir" and normalized_symbol == "ath"):
+            symbol_to_id[symbol] = "aethir"
+            continue
+
+        if (normalized_name == "zeusnetwork" and normalized_symbol == "zeus"):
+            symbol_to_id[symbol] = "zeus-network"
+            continue
+
+        if (normalized_name == "joe" and normalized_symbol == "joe"):
+            symbol_to_id[symbol] = "joe"
+            continue
+
+        if (normalized_name == "thesandbox" or normalized_name == "The Sandbox" or normalized_name == "the sandbox" and normalized_symbol == "sand"):
+            symbol_to_id[symbol] = "the-sandbox"
+            continue
+
+        if (normalized_name == "mantra" and normalized_symbol == "om"):
+            symbol_to_id[symbol] = "mantra-dao"
+            continue
+
+        if (normalized_name == "worldcoin" and normalized_symbol == "wld"):
+            symbol_to_id[symbol] = "worldcoin-wld"
+            continue
+
+        if (normalized_name == "maker" and normalized_symbol == "mkr"):
+            symbol_to_id[symbol] = "maker"
+            continue
+
+        if (normalized_name == "conflux" and normalized_symbol == "cfx"):
+            symbol_to_id[symbol] = "conflux-token"
+            continue
+
+        if (normalized_name == "oasis" and normalized_symbol == "rose"):
+            symbol_to_id[symbol] = "oasis-network"
+            continue
+
+        if (normalized_name == "neo" and normalized_symbol == "neo"):
+            symbol_to_id[symbol] = "neo"
+            continue
+
+        if (normalized_name == "pixels" and normalized_symbol == "pixel"):
+            symbol_to_id[symbol] = "pixels"
+            continue
+
+        if (normalized_name == "sillydragon" or normalized_name == "silly dragon" and normalized_symbol == "silly"):
+            symbol_to_id[symbol] = "silly-dragon"
+            continue
+
+        if (normalized_name == "polylastic" and normalized_symbol == "polx"):
+            symbol_to_id[symbol] = "polylastic"
+            continue
+
+        if (normalized_name == "xai" and normalized_symbol == "xai"):
+            symbol_to_id[symbol] = "xai-blockchain"
+            continue
+
+        if (normalized_name == "hacken" and normalized_symbol == "hai"):
+            symbol_to_id[symbol] = "hacken"
+            continue
+
+        if (normalized_name == "acent" and normalized_symbol == "ace"):
+            symbol_to_id[symbol] = "acent"
+            continue
+        
+        # Nueva lógica de comp]aración para otras monedas
         match_found = False
         for coingecko_id, coingecko_data in coin_map.items():
             # Verificar que coingecko_data sea un diccionario
@@ -1268,7 +1455,6 @@ def get_specific_wallets_data():
     print("Function completed")
     return result
 
-
 # Ejemplo de uso
 #def main():
 #    """
@@ -1281,7 +1467,7 @@ def get_specific_wallets_data():
 #        print("\n1. Getting Master Board data...")
 #        search_param = "Master"
 #        formatted_json = get_formatted_board_items(search_param)
-#        print("��� Master Board data saved to 'board_items.json'")
+#        print(" Master Board data saved to 'board_items.json'")
 #
 #        # 2. Load and update prices
 #        print("\n2. Updating prices for Master Board...")
