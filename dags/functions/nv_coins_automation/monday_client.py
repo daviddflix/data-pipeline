@@ -1455,6 +1455,7 @@ def get_specific_wallets_data():
     print("Function completed")
     return result
 
+
 # Ejemplo de uso
 #def main():
 #    """
