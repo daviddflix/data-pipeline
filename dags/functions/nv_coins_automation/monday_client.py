@@ -983,6 +983,11 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "acent"
             continue
         
+        
+        if (normalized_name == "empirex" or "empire" in normalized_name and normalized_symbol == "x"):
+            symbol_to_id[symbol] = "x-empire"
+            continue
+        
         # Nueva lógica de comp]aración para otras monedas
         match_found = False
         for coingecko_id, coingecko_data in coin_map.items():

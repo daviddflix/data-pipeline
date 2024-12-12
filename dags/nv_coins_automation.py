@@ -37,61 +37,46 @@ with DAG(
 
     def nv_coins_automation_py():   
         """
-        Main execution flow for updating cryptocurrency prices and wallet data.
-        
-        This function performs several key operations:
-        1. Retrieves data from the Master Board
-        2. Updates cryptocurrency prices in the Master Board
-        3. Gets wallet-specific data
-        4. Updates prices for each wallet's coins
-        5. Cleans up temporary files
-        
-        The function includes error handling and logging throughout the process.
-        """
+    Main execution flow for updating cryptocurrency prices and wallet data.
+    """
         try:
             print("\n=== Starting Price Update Process ===")
-
-            # Step 1: Retrieve Master Board data by searching for boards with "Master" in the name
+            
+            # 1. Get Master Board data
             print("\n1. Getting Master Board data...")
             search_param = "Master"
             formatted_json = get_formatted_board_items(search_param)
             print(" Master Board data saved to 'board_items.json'")
-
-            # Step 2: Load the Master Board data from file and update all coin prices
+    
+            # 2. Load and update prices
             print("\n2. Updating prices for Master Board...")
             with open('all_boards_data.json', 'r') as f:
                 master_board_data = json.load(f)
             updated_master = update_coin_prices(master_board_data)
             print("✓ Master Board prices updated")
-
-            # Step 3: Retrieve data for specific wallets we want to track
+    
+            #1. Get wallet data
             print("\n1. Getting wallet data...")
             wallets_data = get_specific_wallets_data()
             if not wallets_data['success']:
                 raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
             print("✓ Wallet data retrieved")
-
-            # Step 4: Update prices for each coin in the wallets
+    
+            # 2. Update prices directly using change_column_value
             print("\n2. Updating prices in Monday.com...")
             board_id = 1652251054  # CEX MASTER BOARD ID
-
-            # Iterate through each wallet group and its items
+            
             for group_name, items in wallets_data['data'].items():
                 print(f"\nProcessing group: {group_name}")
                 for item in items:
                     try:
-                        # Extract necessary item data
                         item_id = item['id']
                         code = item['columns']['Code']['value']
                         valuation_column_id = item['columns']['Valuation Price']['id']
-
-                        # Only process items with a valid coin code
+                        
                         if code:
-                            # Get current price for the coin
                             prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [{"coin_symbol": code, "coin_name": item['name']}])
                             price = prices.get(code.lower(), {}).get('usd', 0)
-                            
-                            # Update the price in Monday.com
                             result = change_column_value(
                                 item_id=int(item_id),
                                 board_id=board_id,
@@ -99,30 +84,29 @@ with DAG(
                                 value=str(price)
                             )
                             print(f"{'✓' if result else '⚠️'} {code}: {item['name']}")
-
-                        # Add delay to avoid rate limiting
-                        time.sleep(0.5)
-
+                        
+                        time.sleep(0.5)  # Evitar límites de rate
+                        
                     except Exception as e:
                         print(f"⚠️ Error updating {item['name']}: {str(e)}")
                         continue
-
-            # Step 5: Clean up temporary files
+                    
+            # 4. Clean up
             print("\n4. Cleaning up...")
-            # Reset all_boards_data.json to empty state
+            # Clean all_boards_data.json
             with open('all_boards_data.json', 'w') as f:
                 json.dump({"boards": []}, f, indent=2)
-            # Reset all_items_minimal.json to empty state
+            # Clean all_items_minimal.json
             with open('all_items_minimal.json', 'w') as f:
                 json.dump({"success": True, "data": {}, "error": None}, f, indent=2)
             print("✓ Temporary files cleaned")
-
+    
             print("\n=== Process Completed Successfully ===")
-
+            
         except Exception as e:
             print(f"\n⚠️ Error in main process: {str(e)}")
             print("Process terminated with errors")
-        
+
      # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(
         task_id='nv_coins_automation',  # Unique identifier for this task
