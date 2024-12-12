@@ -113,6 +113,5 @@ with DAG(
         python_callable=nv_coins_automation_py,  # Points to our processing function
         dag=dag  # Associates this task with our DAG
     )
-
     # Define task flow (single task, so no dependencies needed)
     nv_coins_automation
