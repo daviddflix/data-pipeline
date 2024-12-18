@@ -1002,12 +1002,21 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             continue
         
         
+        if (normalized_name == "landshare" or "landshare" in normalized_name and normalized_symbol == "land"):
+            symbol_to_id[symbol] = "landshare"
+            continue
+        
+        
         if (normalized_name == "phoenix" or "phoenix" in normalized_name and normalized_symbol == "phb"):
             symbol_to_id[symbol] = "phoenix-global"
             continue
         
         if (normalized_name == "banana" or "banana" in normalized_name and normalized_symbol == "banana"):
             symbol_to_id[symbol] = "banana-gun"
+            continue
+        
+        if (normalized_name == "aimedis" or "aimedis" in normalized_name and normalized_symbol == "aimx"):
+            symbol_to_id[symbol] = "aimedis-new"
             continue
         
         match_found = False
@@ -1481,6 +1490,7 @@ def get_specific_wallets_data():
         
     print("Function completed")
     return result
+
 
 # Ejemplo de uso
 #def main():

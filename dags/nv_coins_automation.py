@@ -38,41 +38,41 @@ with DAG(
     def nv_coins_automation_py():   
         """
         Main execution flow for updating cryptocurrency prices and wallet data.
+        
         This function performs the following steps:
-        1. Gets Master Board data from Monday.com
-        2. Updates prices for the Master Board
-        3. Retrieves wallet data 
-        4. Updates prices for each wallet
-        5. Cleans up temporary files
+        1. Retrieves Master Board data from Monday.com
+        2. Updates prices for Master Board items
+        3. Gets wallet data and updates prices for each wallet
+        4. Cleans up temporary files
         """
         try:
             print("\n=== Starting Price Update Process ===")
-
-            # Step 1: Get Master Board data from Monday.com
+            
+            # Step 1: Retrieve Master Board data from Monday.com
             print("\n1. Getting Master Board data...")
             search_param = "Master"
-            formatted_json = get_formatted_board_items(search_param)
+            formatted_json = get_formatted_board_items(search_param)  # Get board items matching "Master"
             print(" Master Board data saved to 'board_items.json'")
 
-            # Step 2: Load existing data and update prices
+            # Step 2: Load Master Board data and update prices
             print("\n2. Updating prices for Master Board...")
             with open('all_boards_data.json', 'r') as f:
-                master_board_data = json.load(f)
-            updated_master = update_coin_prices(master_board_data)
+                master_board_data = json.load(f)  # Load saved board data
+            updated_master = update_coin_prices(master_board_data)  # Update prices for all coins
             print("✓ Master Board prices updated")
 
-            # Step 3: Retrieve wallet data from Monday.com
+            # Step 3a: Retrieve wallet data from Monday.com
             print("\n1. Getting wallet data...")
-            wallets_data = get_specific_wallets_data()
+            wallets_data = get_specific_wallets_data()  # Get data for all wallets
             if not wallets_data['success']:
                 raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
             print("✓ Wallet data retrieved")
 
-            # Step 4: Update prices for each wallet in Monday.com
+            # Step 3b: Update prices for each wallet in Monday.com
             print("\n2. Updating prices in Monday.com...")
             board_id = 1652251054  # CEX MASTER BOARD ID
-
-            # Process each group of wallets
+            
+            # Iterate through each group of wallets
             for group_name, items in wallets_data['data'].items():
                 print(f"\nProcessing group: {group_name}")
                 for item in items:
@@ -81,14 +81,13 @@ with DAG(
                         item_id = item['id']
                         code = item['columns']['Code']['value']
                         valuation_column_id = item['columns']['Valuation Price']['id']
-
-                        # Update price if coin code exists
+                        
                         if code:
-                            # Get current price from CoinGecko API
+                            # Get current price for the coin
                             prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [{"coin_symbol": code, "coin_name": item['name']}])
                             price = prices.get(code.lower(), {}).get('usd', 0)
                             
-                            # Update price in Monday.com
+                            # Update the price in Monday.com
                             result = change_column_value(
                                 item_id=int(item_id),
                                 board_id=board_id,
@@ -96,14 +95,14 @@ with DAG(
                                 value=str(price)
                             )
                             print(f"{'✓' if result else '⚠️'} {code}: {item['name']}")
-
-                        time.sleep(0.5)  # Rate limiting delay
-
+                        
+                        time.sleep(0.5)  # Rate limiting to avoid API restrictions
+                        
                     except Exception as e:
                         print(f"⚠️ Error updating {item['name']}: {str(e)}")
                         continue
 
-            # Step 5: Clean up temporary files
+            # Step 4: Clean up temporary files
             print("\n4. Cleaning up...")
             # Reset all_boards_data.json to empty state
             with open('all_boards_data.json', 'w') as f:
@@ -114,11 +113,10 @@ with DAG(
             print("✓ Temporary files cleaned")
 
             print("\n=== Process Completed Successfully ===")
-
+            
         except Exception as e:
             print(f"\n⚠️ Error in main process: {str(e)}")
             print("Process terminated with errors")
-
     # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(
         task_id='nv_coins_automation',  # Unique identifier for this task
