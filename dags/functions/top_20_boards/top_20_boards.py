@@ -257,6 +257,44 @@ def create_group_and_add_items(board_id, group_name, items_data):
         print(f"Response content: {response.text if 'response' in locals() else 'No response'}")
         return False
 
+def delete_all_groups_except_first(board_id):
+    """Delete all groups in a board except the first one (template)"""
+    query = f'''
+    query {{
+        boards(ids: {board_id}) {{
+            groups {{
+                id
+                title
+            }}
+        }}
+    }}
+    '''
+    
+    try:
+        # Get all groups
+        response = requests.post(monday_url, headers=headers, json={'query': query})
+        response.raise_for_status()
+        groups = response.json()['data']['boards'][0]['groups']
+        
+        # Skip first group and delete the rest
+        for group in groups[1:]:  # Start from index 1 to skip first group
+            delete_query = f'''
+            mutation {{
+                delete_group (board_id: {board_id}, group_id: "{group['id']}") {{
+                    id
+                }}
+            }}
+            '''
+            response = requests.post(monday_url, headers=headers, json={'query': delete_query})
+            response.raise_for_status()
+            time.sleep(0.5)  # Rate limiting
+            
+        print(f"All groups except template deleted from board {board_id}")
+        return True
+    except Exception as e:
+        print(f"Error deleting groups: {str(e)}")
+        return False
+
 def update_monday_boards():
     from datetime import datetime
     current_week = datetime.now().strftime("Week %V - %Y")
@@ -268,28 +306,29 @@ def update_monday_boards():
         with open('worst.json', 'r') as f:
             worst_20_data = json.load(f)
             
-        # Actualizar el tablero de las mejores monedas
-        print("Updating Weekly Best TOP 20...")
+        # Primero crear los nuevos grupos
+        print("Creating new groups...")
         success_best = create_group_and_add_items(
             board_id=1716371627,
             group_name=current_week,
             items_data=best_20_data
         )
-        # Agregar retraso entre actualizaciones
         time.sleep(1)
         
-        # Actualizar el tablero de las peores monedas
-        print("Updating Weekly Lowest TOP 20...")
         success_worst = create_group_and_add_items(
             board_id=1721925921,
             group_name=current_week,
             items_data=worst_20_data
         )
         
+        # Luego borrar los grupos antiguos (excepto el template y el recién creado)
         if success_best and success_worst:
+            print("Deleting old groups...")
+            delete_all_groups_except_first(1716371627)  # Best TOP 20 board
+            delete_all_groups_except_first(1721925921)  # Worst TOP 20 board
             print(f"Data successfully updated in both boards for {current_week}")
         else:
-            print("There were errors updating the boards")
+            print("There were errors creating the new groups")
             
     except Exception as e:
         print(f"Error loading or processing data: {str(e)}")
@@ -297,7 +336,6 @@ def update_monday_boards():
     finally:
         # Limpiar los archivos JSON utilizados
         try:
-            # Eliminar los archivos JSON después de usarlos
             os.remove('best.json')
             os.remove('worst.json')
             os.remove('BOARD_DATA.json')

@@ -1,5 +1,7 @@
 import os
-import time 
+import time
+from typing import Optional 
+from bs4 import BeautifulSoup
 from monday import MondayClient 
 import requests
 import json
@@ -863,8 +865,9 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "coredaoorg"
             continue 
         
-        if (normalized_name == "pepe" and normalized_symbol == "pepe"):
+        if (normalized_name == "pepe" or "pepe" in normalized_name and normalized_symbol == "pepe"):
             symbol_to_id[symbol] = "pepe"
+            print("se encontro pepe: ", symbol_to_id[symbol])
             continue 
         
         if (normalized_name == "ape" or normalized_name == "apecoin" or normalized_name == "ape coin" and normalized_symbol == "ape"):
@@ -930,7 +933,15 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         if (normalized_name == "aethir" and normalized_symbol == "ath"):
             symbol_to_id[symbol] = "aethir"
             continue
-
+        
+        if ("do" in normalized_name and normalized_symbol == "dojo"):
+            symbol_to_id[symbol] = "dojo-token"
+            continue
+        
+        if (normalized_name == "mantle" or "mantle" in normalized_name and normalized_symbol == "mnt"):
+            symbol_to_id[symbol] = "mantle"
+            continue
+        
         if (normalized_name == "zeusnetwork" and normalized_symbol == "zeus"):
             symbol_to_id[symbol] = "zeus-network"
             continue
@@ -1491,6 +1502,102 @@ def get_specific_wallets_data():
     print("Function completed")
     return result
 
+def get_sentx_price() -> Optional[float]:
+    """
+    Obtiene el precio actual de SENTX usando web scraping de GeckoTerminal.
+    
+    Returns:
+        float: El precio actual de SENTX, o None si no se puede obtener
+    """
+    try:
+        # Headers necesarios para simular un navegador
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'max-age=0'
+        }
+
+        url = "https://www.geckoterminal.com/hedera-hashgraph/pools/0x77944cda575c4ac09cbb72809c2551b3f134b4e0"
+        print(f"Requesting page from: {url}")
+        
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+
+        # Parsear el HTML
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Buscar el elemento específico que contiene el precio
+        price_element = soup.find('span', id='pool-price-display')
+        
+        if price_element:
+            # Obtener el span interno que contiene el precio
+            price_span = price_element.find('span')
+            if price_span:
+                # Extraer el precio y limpiarlo
+                price_text = price_span.text.strip()
+                price = float(price_text.replace('$', '').replace(',', ''))
+                
+                # Crear el formato de datos requerido
+                output_data = {
+                    "coins": [{
+                        "coin_name": "SENTX",
+                        "coin_symbol": "SENTX",
+                        "buy_price": price
+                    }]
+                }
+                
+                # Guardar en archivo
+                with open('sentx_data.json', 'w') as f:
+                    json.dump(output_data, f, indent=4)
+                
+                return price
+            else:
+                print("Price span not found inside pool-price-display")
+        else:
+            print("Price element not found")
+            # Para debug, guardar el HTML
+            with open('debug_page.html', 'w', encoding='utf-8') as f:
+                f.write(response.text)
+            print("Saved HTML to debug_page.html for inspection")
+        
+        return None
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Request error: {e}")
+        if hasattr(e, 'response') and hasattr(e.response, 'text'):
+            print(f"Response text: {e.response.text[:500]}...")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        print(f"Error details: {str(e)}")
+        return None
+
+def update_sentx_prices():
+    try:
+        sentx_price = get_sentx_price()
+        if sentx_price:
+            # Read the JSON file
+            with open('all_boards_data.json', 'r') as f:
+                data = json.load(f)
+            
+            # Find and update SENTX items
+            for board in data.get('boards', []):
+                for coin in board.get('coins', []):
+                    if coin['coin_symbol'].lower() == 'sentx':
+                        change_column_value(
+                            item_id=int(coin['coin_id']),
+                            board_id=int(board['board_id']),
+                            column_id=coin['column_ids']['valuation_price_column_id'],
+                            value=str(sentx_price)
+                        )
+                        print(f"Updated SENTX price to {sentx_price} for item {coin['coin_id']}")
+    except Exception as e:
+        print(f"Error updating SENTX prices: {e}")
+
+
 # Ejemplo de uso
 #def main():
 #    """
@@ -1499,7 +1606,7 @@ def get_specific_wallets_data():
 #    try:
 #        print("\n=== Starting Price Update Process ===")
 #        
-#        # 1. Get Master Board data
+#        # # 1. Get Master Board data
 #        print("\n1. Getting Master Board data...")
 #        search_param = "Master"
 #        formatted_json = get_formatted_board_items(search_param)
@@ -1512,7 +1619,7 @@ def get_specific_wallets_data():
 #        updated_master = update_coin_prices(master_board_data)
 #        print("✓ Master Board prices updated")
 #
-#        #1. Get wallet data
+#        # 1. Get wallet data
 #        print("\n1. Getting wallet data...")
 #        wallets_data = get_specific_wallets_data()
 #        if not wallets_data['success']:
@@ -1532,24 +1639,46 @@ def get_specific_wallets_data():
 #                    valuation_column_id = item['columns']['Valuation Price']['id']
 #                    
 #                    if code:
-#                        prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [{"coin_symbol": code, "coin_name": item['name']}])
+#                        print(f"\nProcessing wallet item: {item['name']} with code: {code}")
+#                        # Usar exactamente la misma estructura que en la función principal
+#                        prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [
+#                            {
+#                                "coin_symbol": code,
+#                                "coin_name": item['name']
+#                            }
+#                        ])
+#                        
+#                        # Obtener el precio usando el código en minúsculas
 #                        price = prices.get(code.lower(), {}).get('usd', 0)
+#                        print(f"Found price for {code}: ${price}")
+#                        
+#                        # Formatear el precio como en la función principal
+#                        try:
+#                            price = float(price)
+#                            formatted_price = f"{price:.7f}".rstrip('0').rstrip('.')
+#                        except ValueError:
+#                            formatted_price = "0"
+#                        
 #                        result = change_column_value(
 #                            item_id=int(item_id),
 #                            board_id=board_id,
 #                            column_id=valuation_column_id,
-#                            value=str(price)
+#                            value=formatted_price
 #                        )
-#                        print(f"{'✓' if result else '⚠️'} {code}: {item['name']}")
+#                        print(f"{'✓' if result else '⚠️'} Updated {code}: {item['name']} with price {formatted_price}")
 #                    
-#                    time.sleep(0.5)  # Evitar límites de rate
+#                    time.sleep(0.5)
 #                    
 #                except Exception as e:
 #                    print(f"⚠️ Error updating {item['name']}: {str(e)}")
 #                    continue
-#
-#        # 4. Clean up
-#        print("\n4. Cleaning up...")
+#        
+#        # 4. Updating SENTX prices...   
+#        print("\n4. Updating SENTX prices...")
+#        update_sentx_prices()
+#        
+#        # 5. Clean up
+#        print("\n5. Cleaning up...")
 #        # Clean all_boards_data.json
 #        with open('all_boards_data.json', 'w') as f:
 #            json.dump({"boards": []}, f, indent=2)
@@ -1559,10 +1688,9 @@ def get_specific_wallets_data():
 #        print("✓ Temporary files cleaned")
 #
 #        print("\n=== Process Completed Successfully ===")
-#        
 #    except Exception as e:
 #        print(f"\n⚠️ Error in main process: {str(e)}")
 #        print("Process terminated with errors")
 #
-#if __name__ == "__main__":
+#if __name__ == "__main__":  
 #    main()
