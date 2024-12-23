@@ -1296,6 +1296,7 @@ def get_specific_wallets_data():
         {"title": "CLOSED - OKX Sepia International Wallet", "id": "new_group5225__1"},
         {"title": "Rajan's Tangem Wallet #1 (from KuCoin)", "id": "new_group32432__1"},
         {"title": "Aman's Tangem Wallet #2 (from Bybit Sepia)", "id": "new_group37173__1"},
+        {"title": "Aman's Tangem Wallet #3 (from Rabby BNB)", "id": "new_group_mkk9zkqg"}
     ]
     
     try:
@@ -1596,6 +1597,7 @@ def update_sentx_prices():
                         print(f"Updated SENTX price to {sentx_price} for item {coin['coin_id']}")
     except Exception as e:
         print(f"Error updating SENTX prices: {e}")
+
 
 # Ejemplo de uso
 #def main():

@@ -39,41 +39,45 @@ with DAG(
     def nv_coins_automation_py():   
         """
         Main execution flow for updating cryptocurrency prices and wallet data.
-        This function performs the following steps:
-        1. Gets Master Board data from Monday.com
-        2. Updates prices in Master Board
-        3. Gets and processes wallet data 
-        4. Updates SENTX prices
-        5. Cleans up temporary files
+        
+        This function performs several key operations:
+        1. Retrieves and updates Master Board data
+        2. Gets wallet data and updates prices
+        3. Updates SENTX prices
+        4. Cleans up temporary files
         """
         try:
             print("\n=== Starting Price Update Process ===")
             
-            # Step 1: Get Master Board data from Monday.com
+            # Step 1: Get Master Board data
+            # Retrieve formatted board items for boards with "Master" in their name
             print("\n1. Getting Master Board data...")
             search_param = "Master"
-            formatted_json = get_formatted_board_items(search_param)  # Retrieves board items with "Master" in name
+            formatted_json = get_formatted_board_items(search_param)
             print(" Master Board data saved to 'board_items.json'")
 
-            # Step 2: Load Master Board data and update prices
+            # Step 2: Load and update Master Board prices
+            # Read the board data and update coin prices
             print("\n2. Updating prices for Master Board...")
             with open('all_boards_data.json', 'r') as f:
                 master_board_data = json.load(f)
-            updated_master = update_coin_prices(master_board_data)  # Updates prices for all coins in Master Board
+            updated_master = update_coin_prices(master_board_data)
             print("✓ Master Board prices updated")
 
-            # Step 3a: Retrieve wallet data from Monday.com
+            # Step 3: Get wallet data
+            # Retrieve data for specific wallets from Monday.com
             print("\n1. Getting wallet data...")
-            wallets_data = get_specific_wallets_data()  # Gets data for specific wallet groups
+            wallets_data = get_specific_wallets_data()
             if not wallets_data['success']:
                 raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
             print("✓ Wallet data retrieved")
 
-            # Step 3b: Update prices for each wallet using CoinGecko API
+            # Step 4: Update prices in Monday.com
+            # Iterate through wallet items and update their prices
             print("\n2. Updating prices in Monday.com...")
             board_id = 1652251054  # CEX MASTER BOARD ID
             
-            # Process each wallet group
+            # Process each group of wallets
             for group_name, items in wallets_data['data'].items():
                 print(f"\nProcessing group: {group_name}")
                 for item in items:
@@ -85,7 +89,7 @@ with DAG(
                         
                         if code:
                             print(f"\nProcessing wallet item: {item['name']} with code: {code}")
-                            # Get current price from CoinGecko API
+                            # Get current coin prices from API
                             prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [
                                 {
                                     "coin_symbol": code,
@@ -93,18 +97,18 @@ with DAG(
                                 }
                             ])
                             
-                            # Extract USD price from response
+                            # Extract USD price for the coin
                             price = prices.get(code.lower(), {}).get('usd', 0)
                             print(f"Found price for {code}: ${price}")
                             
-                            # Format price with proper decimal places
+                            # Format price to 7 decimal places, removing trailing zeros
                             try:
                                 price = float(price)
                                 formatted_price = f"{price:.7f}".rstrip('0').rstrip('.')
                             except ValueError:
                                 formatted_price = "0"
                             
-                            # Update price in Monday.com board
+                            # Update the price in Monday.com
                             result = change_column_value(
                                 item_id=int(item_id),
                                 board_id=board_id,
@@ -113,17 +117,18 @@ with DAG(
                             )
                             print(f"{'✓' if result else '⚠️'} Updated {code}: {item['name']} with price {formatted_price}")
                         
-                        time.sleep(0.5)  # Rate limiting pause between API calls
+                        # Rate limiting delay
+                        time.sleep(0.5)
                         
                     except Exception as e:
                         print(f"⚠️ Error updating {item['name']}: {str(e)}")
                         continue
             
-            # Step 4: Update SENTX specific prices
+            # Step 5: Update SENTX prices
             print("\n4. Updating SENTX prices...")
             update_sentx_prices()
             
-            # Step 5: Clean up temporary files
+            # Step 6: Clean up temporary files
             print("\n5. Cleaning up...")
             # Reset all_boards_data.json to empty state
             with open('all_boards_data.json', 'w') as f:
@@ -137,7 +142,7 @@ with DAG(
         except Exception as e:
             print(f"\n⚠️ Error in main process: {str(e)}")
             print("Process terminated with errors")
-
+            
     # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(
         task_id='nv_coins_automation',  # Unique identifier for this task
