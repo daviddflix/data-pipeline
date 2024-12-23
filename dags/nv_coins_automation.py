@@ -142,7 +142,6 @@ with DAG(
         except Exception as e:
             print(f"\n⚠️ Error in main process: {str(e)}")
             print("Process terminated with errors")
-            
     # Create the task that will execute our coin price update function
     nv_coins_automation = PythonOperator(
         task_id='nv_coins_automation',  # Unique identifier for this task
