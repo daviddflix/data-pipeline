@@ -37,10 +37,32 @@ with DAG(
 ) as dag:
 
     def nv_coins_automation_py():
+        """
+        Main function for automating cryptocurrency price updates and wallet data synchronization in Monday.com boards.
+        
+        The function performs the following steps:
+        1. Retrieves Master Board data from Monday.com
+        2. Updates cryptocurrency prices for the Master Board
+        3. Fetches and processes wallet data
+        4. Updates individual wallet prices in Monday.com using the CoinGecko API
+        5. Updates SENTX-specific prices
+        6. Performs cleanup of temporary files
+        
+        The function includes error handling and logging at each step.
+        
+        Raises:
+            Exception: If there are errors in retrieving wallet data or other critical operations
+            
+        Note:
+            - Uses CoinGecko API for price data
+            - Implements rate limiting (0.5s delay between API calls)
+            - Handles price formatting to 7 decimal places
+            - Operates on CEX MASTER board (ID: 1652251054)
+        """
         try:
             print("\n=== Starting Price Update Process ===")
-
-            # # 1. Get Master Board data
+            
+            # 1. Get Master Board data
             print("\n1. Getting Master Board data...")
             search_param = "Master"
             formatted_json = get_formatted_board_items(search_param)
@@ -53,17 +75,17 @@ with DAG(
             updated_master = update_coin_prices(master_board_data)
             print("✓ Master Board prices updated")
 
-            # 1. Get wallet data
+            # 3. Get wallet data
             print("\n1. Getting wallet data...")
             wallets_data = get_specific_wallets_data()
             if not wallets_data['success']:
                 raise Exception(f"Failed to get wallet data: {wallets_data['error']}")
             print("✓ Wallet data retrieved")
 
-            # 2. Update prices directly using change_column_value
+            # 4. Update prices directly using change_column_value
             print("\n2. Updating prices in Monday.com...")
             board_id = 1652251054  # CEX MASTER BOARD ID
-
+            
             for group_name, items in wallets_data['data'].items():
                 print(f"\nProcessing group: {group_name}")
                 for item in items:
@@ -71,28 +93,28 @@ with DAG(
                         item_id = item['id']
                         code = item['columns']['Code']['value']
                         valuation_column_id = item['columns']['Valuation Price']['id']
-
+                        
                         if code:
                             print(f"\nProcessing wallet item: {item['name']} with code: {code}")
-                            # Usar exactamente la misma estructura que en la función principal
+                            # Use CoinGecko API to get current prices
                             prices = get_coin_prices("CG-4uzPgs2oyq4aL8vqJEoB2zfD", [
                                 {
                                     "coin_symbol": code,
                                     "coin_name": item['name']
                                 }
                             ])
-
-                            # Obtener el precio usando el código en minúsculas
+                            
+                            # Get price using lowercase code
                             price = prices.get(code.lower(), {}).get('usd', 0)
                             print(f"Found price for {code}: ${price}")
-
-                            # Formatear el precio como en la función principal
+                            
+                            # Format price to 7 decimal places
                             try:
                                 price = float(price)
                                 formatted_price = f"{price:.7f}".rstrip('0').rstrip('.')
                             except ValueError:
                                 formatted_price = "0"
-
+                            
                             result = change_column_value(
                                 item_id=int(item_id),
                                 board_id=board_id,
@@ -100,18 +122,18 @@ with DAG(
                                 value=formatted_price
                             )
                             print(f"{'✓' if result else '⚠️'} Updated {code}: {item['name']} with price {formatted_price}")
-
-                        time.sleep(0.5)
-
+                        
+                        time.sleep(0.5)  # Rate limiting
+                        
                     except Exception as e:
                         print(f"⚠️ Error updating {item['name']}: {str(e)}")
                         continue
-                    
-            # 4. Updating SENTX prices...   
+            
+            # 5. Update SENTX prices   
             print("\n4. Updating SENTX prices...")
             update_sentx_prices()
-
-            # 5. Clean up
+            
+            # 6. Clean up temporary files
             print("\n5. Cleaning up...")
             # Clean all_boards_data.json
             with open('all_boards_data.json', 'w') as f:

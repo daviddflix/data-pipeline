@@ -686,7 +686,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         normalized_symbol = symbol.replace(" ", "").replace("-", "").strip()
         
         # Manejo especial para Ethereum
-        if (normalized_name == "ethereum" and normalized_symbol == "eth"):
+        if (normalized_name == "ethereum" or "Wrapped rsETH" in normalized_name or "wrapped rseth" in normalized_name  or "Mantle Staked Ether" in normalized_name or "mantle staked ether" in normalized_name and normalized_symbol == "eth" or normalized_symbol == "weth" or normalized_symbol == "rseth"):
             symbol_to_id[symbol] = "ethereum"  # Asignar directamente el ID de Ethereum
             continue 
 
@@ -770,12 +770,45 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "dojo-token"
             continue 
         
+      
+        if (normalized_name == "akash-network" or normalized_name == "Akash Network" or "akash" in normalized_name and normalized_symbol == "akt"):
+            symbol_to_id[symbol] = "akash-network"
+            continue 
+        
         if (normalized_name == "sei" and normalized_symbol == "sei"):
             symbol_to_id[symbol] = "sei-network"
             continue 
         
+        if (normalized_name == "bullbar" or "bullbar" in normalized_name and normalized_symbol == "bull"):
+            symbol_to_id[symbol] = "bullbar"
+            continue 
+        
+        if (normalized_name == "aura-network" or "aura" in normalized_name and normalized_symbol == "aura"):
+            symbol_to_id[symbol] = "aura-network"
+            continue 
+        
         if (normalized_name == "hedera" and normalized_symbol == "hbar"):
             symbol_to_id[symbol] = "hedera-hashgraph"
+            continue 
+        
+        if (normalized_name == "edge matrix computing" or "edge matrix computing" in normalized_name or "matrix" in normalized_name and normalized_symbol == "emc"):
+            symbol_to_id[symbol] = "edge-matrix-computing"
+            continue 
+        
+        if (normalized_name == "picasso" or "picasso" in normalized_name and normalized_symbol == "pica"):
+            symbol_to_id[symbol] = "picasso"
+            continue 
+        
+        if (normalized_name == "wicrypt" or "wicrypt" in normalized_name and normalized_symbol == "wnt"):
+            symbol_to_id[symbol] = "wicrypt"
+            continue 
+        
+        if (normalized_name == "ait-protocol" or "ait-protocol" in normalized_name  or "ait" in normalized_name and normalized_symbol == "ait"):
+            symbol_to_id[symbol] = "ait-protocol"
+            continue 
+        
+        if (normalized_name == "moe" or "moe" in normalized_name and normalized_symbol == "moe"):
+            symbol_to_id[symbol] = "moe"
             continue 
         
         if (normalized_name == "CovalentX" or normalized_name == "covalentx" and normalized_symbol == "cqt"):
@@ -788,7 +821,11 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         
         if (normalized_name == "ava" or "ava" in normalized_name and normalized_symbol == "ava"):
             symbol_to_id[symbol] = "concierge-io"
-            continue 
+            continue
+        
+        if (normalized_name == "binancecoin" or normalized_name == "BNB" or "WrappedBNB" in normalized_name or "wrappedbnb" in normalized_name and normalized_symbol == "bnb" or normalized_symbol == "wBNB"):
+            symbol_to_id[symbol] = "binancecoin"
+            continue
         
         if (normalized_name == "soil" and normalized_symbol == "soil"):
             symbol_to_id[symbol] = "soil"
@@ -824,6 +861,11 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         if (normalized_name == "spacemesh" or normalized_name == "Spacemesh" and normalized_symbol == "SMH"):
             symbol_to_id[symbol] = "spacemesh"
             continue 
+        
+        if (normalized_name == "injective-protocol" or normalized_name == "Injective"  or "injective" in normalized_name  or "Hydro Staked INJ" in normalized_name or "hydro staked inj" in normalized_name or normalized_name == "Injective Protocol" and normalized_symbol == "inj" or normalized_symbol == "inj" or normalized_symbol == "hinj"):
+            symbol_to_id[symbol] = "injective-protocol"
+            continue 
+        
         
         if (normalized_name == "gearbox" and normalized_symbol == "gear"):
             symbol_to_id[symbol] = "gearbox"
@@ -865,6 +907,10 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "coredaoorg"
             continue 
         
+        if (normalized_name == "pancakeswap" or normalized_name == "pancake" or "mcake" in normalized_name or normalized_name == "pancake swap" or normalized_name == "pancake swap" and normalized_symbol == "cake" or normalized_symbol == "mcake"):
+            symbol_to_id[symbol] = "pancakeswap-token"
+            continue 
+        
         if (normalized_name == "pepe" or "pepe" in normalized_name and normalized_symbol == "pepe"):
             symbol_to_id[symbol] = "pepe"
             print("se encontro pepe: ", symbol_to_id[symbol])
@@ -894,12 +940,20 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "dogwifcoin"
             continue
 
-        if (normalized_name == "celestia" and normalized_symbol == "tia"):
+        if (normalized_name == "celestia" or "Stride Staked TIA" in normalized_name  or "stride staked TIA" in normalized_name or "MilkyWay Staked TIA" in normalized_name or "staked tia" in normalized_name and normalized_symbol == "tia" or normalized_symbol == "milktia" or normalized_symbol == "sttia"):
             symbol_to_id[symbol] = "celestia"
             continue
         
         if (normalized_name == "entangle" and normalized_symbol == "ngl"):
             symbol_to_id[symbol] = "entangle"
+            continue
+        
+        if (normalized_name == "marinade staked sol" or "marinade staked sol" in normalized_name or "marinade" in normalized_name and normalized_symbol == "msol"):
+            symbol_to_id[symbol] = "solana"
+            continue
+        
+        if (normalized_name == "metis" or "metis" in normalized_name and normalized_symbol == "metis" or normalized_symbol == "wmetis"):
+            symbol_to_id[symbol] = "metis-token"
             continue
         
         if (normalized_name == "decentraland" and normalized_symbol == "mana"):
@@ -934,11 +988,15 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "aethir"
             continue
         
+        if (normalized_name == "usd-coin" or "bridged usdc" in normalized_name or normalized_name == "usdc" and normalized_symbol == "usdc" or normalized_symbol == "m.usdc"):
+            symbol_to_id[symbol] = "usd-coin"
+            continue
+        
         if ("do" in normalized_name and normalized_symbol == "dojo"):
             symbol_to_id[symbol] = "dojo-token"
             continue
         
-        if (normalized_name == "mantle" or "mantle" in normalized_name and normalized_symbol == "mnt"):
+        if (normalized_name == "mantle"  or "manMantle Staked Ethertle" in normalized_name or "mantle staked ether" in normalized_name or "mantle" in normalized_name and normalized_symbol == "mnt" or normalized_symbol == "meth"):
             symbol_to_id[symbol] = "mantle"
             continue
         
@@ -946,7 +1004,7 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "zeus-network"
             continue
 
-        if (normalized_name == "joe" and normalized_symbol == "joe"):
+        if (normalized_name == "joe"  or "sjoe" in normalized_name and normalized_symbol == "joe" or normalized_symbol == "sjoe"):
             symbol_to_id[symbol] = "joe"
             continue
 
@@ -1598,6 +1656,7 @@ def update_sentx_prices():
     except Exception as e:
         print(f"Error updating SENTX prices: {e}")
 
+
 # Ejemplo de uso
 #def main():
 #    """
@@ -1694,3 +1753,4 @@ def update_sentx_prices():
 #
 #if __name__ == "__main__":  
 #    main()
+#
