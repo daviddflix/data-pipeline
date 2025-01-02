@@ -1656,7 +1656,6 @@ def update_sentx_prices():
     except Exception as e:
         print(f"Error updating SENTX prices: {e}")
 
-
 # Ejemplo de uso
 #def main():
 #    """
@@ -1753,4 +1752,3 @@ def update_sentx_prices():
 #
 #if __name__ == "__main__":  
 #    main()
-#
