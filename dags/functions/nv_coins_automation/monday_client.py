@@ -694,6 +694,11 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         if (normalized_name == "fraxshare" or normalized_name == "frax share" and normalized_symbol == "fxs"):
             symbol_to_id[symbol] = "frax-share"  # ID en CoinGecko
             continue 
+        
+        if (normalized_name == "ai-rig-complex" or "ai rig complex" in normalized_name and normalized_symbol == "arc"):
+            symbol_to_id[symbol] = "ai-rig-complex"
+            continue
+
 
         # Agregar apartado especial para Lido DAO
         if (normalized_name == "Lido" or normalized_name == "lido" or normalized_name == "Lido dao" or normalized_name == "lido dao" and normalized_symbol == "ldo"):
@@ -1075,6 +1080,17 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "landshare"
             continue
         
+        if (normalized_name == "vabble" or "vabble" in normalized_name and normalized_symbol == "vab"):
+            symbol_to_id[symbol] = "vabble"
+            continue
+        
+        if (normalized_name == "viridis-network" or "veridis" in normalized_name or "viridis-network" in normalized_name and normalized_symbol == "vrd"):
+            symbol_to_id[symbol] = "viridis-network"
+            continue
+        
+        if (normalized_name == "genomesdao" or "genomes" in normalized_name or "genomesdao" in normalized_name and normalized_symbol == "gene"):
+            symbol_to_id[symbol] = "genomesdao"
+            continue
         
         if (normalized_name == "phoenix" or "phoenix" in normalized_name and normalized_symbol == "phb"):
             symbol_to_id[symbol] = "phoenix-global"
@@ -1082,6 +1098,26 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
         
         if (normalized_name == "banana" or "banana" in normalized_name and normalized_symbol == "banana"):
             symbol_to_id[symbol] = "banana-gun"
+            continue
+        
+        if (normalized_name == "stargaze" or "stargaze" in normalized_name and normalized_symbol == "stars"):
+            symbol_to_id[symbol] = "stargaze"
+            continue
+        
+        if (normalized_name == "akash-network" or "akash" in normalized_name and normalized_symbol == "akt"):
+            symbol_to_id[symbol] = "akash-network"
+            continue
+        
+        if (normalized_name == "hsuite" or "hbarsuite" in normalized_name and normalized_symbol == "hsuite"):
+            symbol_to_id[symbol] = "hbarsuite"
+            continue
+        
+        if (normalized_name == "banksocial" or "banksocial" in normalized_name and normalized_symbol == "bsl"):
+            symbol_to_id[symbol] = "banksocial"
+            continue
+        
+        if (normalized_name == "hyperliquid" or "hyperliquid" in normalized_name and normalized_symbol == "hype"):
+            symbol_to_id[symbol] = "hyperliquid"
             continue
         
         if (normalized_name == "aimedis" or "aimedis" in normalized_name and normalized_symbol == "aimx"):
@@ -1655,6 +1691,7 @@ def update_sentx_prices():
                         print(f"Updated SENTX price to {sentx_price} for item {coin['coin_id']}")
     except Exception as e:
         print(f"Error updating SENTX prices: {e}")
+
 
 # Ejemplo de uso
 #def main():
