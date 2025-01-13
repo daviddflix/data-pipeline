@@ -719,6 +719,11 @@ def get_coin_prices(api_key: str, coins: list) -> dict:
             symbol_to_id[symbol] = "bittensor"  # Asignar directamente el ID de Bittensor
             continue 
         
+        
+        if (normalized_name) == "boop" or "boop" in normalized_name and normalized_symbol == "boop":
+            symbol_to_id[symbol] = "boop-2"  # Asignar directamente el ID de Dogecoin
+            continue 
+        
         if (normalized_name == "lido dao" and normalized_symbol == "ldo"):
             symbol_to_id[symbol] = "lido-dao"  # Asignar directamente el ID de Lido DAO
             continue 
@@ -1691,6 +1696,7 @@ def update_sentx_prices():
                         print(f"Updated SENTX price to {sentx_price} for item {coin['coin_id']}")
     except Exception as e:
         print(f"Error updating SENTX prices: {e}")
+
 
 # Ejemplo de uso
 #def main():
